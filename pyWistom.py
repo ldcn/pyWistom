@@ -2,7 +2,7 @@ import socket
 from struct import unpack
 
 from wistomconstants import *
-from wistomconfig import HOST, PORT, USER_ID, PASSWORD
+from wistomconfig import HOST, PORT, USER_ID, PASSWORD, API_VERSION
 
 
 class WistomClient:
@@ -53,7 +53,8 @@ class WistomClient:
         payload_length = (len(user_id_bytes) 
                           + len(password_bytes) 
                           + 2) # add two bytes for the null-terminators
-        payload = user_id_bytes + b'\x00' + password_bytes + b'\x00'
+        payload = (user_id_bytes + b'\x00' 
+                   + password_bytes + b'\x00')
         return (
             b'\x00\x01'  # Example command ID for login
             + self.token.to_bytes(2, 'big')
