@@ -84,8 +84,6 @@ def debug_print(interpreted_data):
     for key, value in interpreted_data.items():
         print(f"{key}: {value}")
 
-
-
 def dissect_data(data):
     command_id = data[0:2].hex()
     token = int.from_bytes(data[2:4], 'big')
