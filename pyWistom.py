@@ -2,14 +2,8 @@ import socket
 from struct import unpack
 
 from wistomconstants import *
+from wistomconfig import HOST, PORT, USER_ID, PASSWORD
 
-## Development stuff
-HOST = "10.44.40.218"
-USER_ID = "admin"
-PASSWORD = "admin"
-## End development stuff
-
-PORT = 7734
 
 class WistomClient:
     def __init__(self, host, port, user_id, password):
