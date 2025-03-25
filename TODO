@@ -1,0 +1,22 @@
+# TODO List for pyWistom Project
+
+- [X] Move hardcoded connection stuff (ip, port, user, password) to config file.
+- [ ] Add error handling for socket/connection errors
+- [ ] Write unit tests for `login` and `send_request`.
+- [ ] Add support for SMGR commands.
+- [ ] Create a CLI similar to the wistsh MMI
+- [ ] Add logging
+- [ ] Fix handling of "unknown" responses
+
+## Security
+- [ ] Mask password entry
+
+## Documentation
+- [ ] Add docstrings to public methods, test with pydoc or similar.
+- [ ] Add more info in README
+
+## Other stuff
+- [ ] jsonify responses (with flask.jsonify)
+- [ ] output graph data with matplotlib/pandas
+- [ ] OPC-UA Client
+- [ ] Modbus TCP
