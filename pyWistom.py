@@ -35,7 +35,7 @@ class WistomClient:
 
     ## Login method
     def login(self):
-        payload = self.__create_login_payload(self.user_id, self.password)
+        payload = self.__create_login_payload()
         response = self.__send_request(payload)
         return self.__parse_login_response(response)
     
@@ -92,7 +92,7 @@ class WistomClient:
 
 if __name__ == "__main__":
 
-    print(f"Connecting to {host}:{port}")
+    print(f"Connecting to {HOST}:{PORT}")
     with WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
         login_response = client.login()
         print("Login Response:", login_response)
