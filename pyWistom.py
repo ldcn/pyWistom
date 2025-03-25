@@ -2,8 +2,10 @@ import socket
 from struct import unpack
 
 from wistomconstants import *
-from wistomconfig import HOST, PORT, USER_ID, PASSWORD, API_VERSION
+from wistomconfig import HOST, PORT, USER_ID, PASSWORD
 
+# Not yet implemented, for future-proofing
+from wistomconfig import API_VERSION
 
 class WistomClient:
     def __init__(self, host, port, user_id, password):
@@ -23,40 +25,48 @@ class WistomClient:
             self.socket.close()
             self.socket = None
 
-    def send_request(self, payload):
-        if not self.socket:
-            raise ConnectionError("Not connected to server")
-        self.socket.sendall(payload)
-        response = self.socket.recv(4096)
-        return response
+    ## Context manager methods
+    def __enter__(self):
+        self.connect()
+        return self
     
-    def increment_token(self):
-        self.token += 1
-        return self.token
-    
+    def __exit__(self, type, value, traceback):
+        self.disconnect()
+
+    ## Login method
     def login(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.host, self.port))
-        self.increment_token()
         payload = self.__create_login_payload(self.user_id, self.password)
-        response = self.send_request(payload)
+        response = self.__send_request(payload)
         return self.__parse_login_response(response)
     
 
+
+    ## Helper methods
+    def __send_request(self, payload):
+        if not self.socket:
+            raise ConnectionError("Not connected to server")
+        self.socket.sendall(payload)
+        response = self.socket.recv(4096) ## Test all possible Wistom API requests
+        return response
+    
+    def __increment_token(self):
+        self.token += 1
+        return self.token
+    
     ## Private methods
 
     ## Creates the login payload as described in Page 74 Table 11-2
     ## of the Wistom User Guide
-    def __create_login_payload(self, user_id, password):
-        user_id_bytes = user_id.encode('ascii')
-        password_bytes = password.encode('ascii')
+    def __create_login_payload(self):
+        user_id_bytes = self.user_id.encode('ascii')
+        password_bytes = self.password.encode('ascii')
         payload_length = (len(user_id_bytes) 
                           + len(password_bytes) 
                           + 2) # add two bytes for the null-terminators
         payload = (user_id_bytes + b'\x00' 
                    + password_bytes + b'\x00')
         return (
-            b'\x00\x01'  # Example command ID for login
+            COMMAND_ID['LOGIN']
             + self.token.to_bytes(2, 'big')
             + b'LGIN'
             + b'API2'
@@ -81,29 +91,12 @@ class WistomClient:
         }
 
 if __name__ == "__main__":
-    host_input = input("Wistom IP: ")
-    host = host_input if host_input else HOST
-    port_input = input(f"Port (default {PORT}): ")
-    port = int(port_input) if port_input else PORT
 
-    client = WistomClient(host, port)
     print(f"Connecting to {host}:{port}")
-    try:
-        client.connect()
-        user_id_input = input("login as: ")
-        password_input = input("Password: ")
-
-        user_id = user_id_input if user_id_input else USER_ID
-        password = password_input if password_input else PASSWORD
-
-        login_response = client.login(user_id, password)
+    with WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
+        login_response = client.login()
         print("Login Response:", login_response)
 
         if login_response.get("command_id") == 'LOGINIRES':
             network_info = client.get_network_info()
             print("Network Info:", network_info)
-
-    except Exception as e:
-        print(f"An error occured: {e}")
-    finally:
-        client.disconnect()
