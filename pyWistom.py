@@ -80,10 +80,17 @@ class WistomClient:
         return self.__handle_response(app_id, op_id, response)
     
     def __handle_response(self, app_id, op_id, response):
-        parser_name = RESPONSE_PARSER.get(app_id.decode('ascii'), {}).get(op_id.decode('ascii'), "_parse_unknown_response")
-        parser = getattr(self, parser_name, self.__parse_unknown_response)
-        return parser(response)
+        cid = response[0:2]
+        if cid == COMMAND_ID['GETERR']:
+            return self.__handle_get_error_response(response)
+        else:
+            parser_name = RESPONSE_PARSER.get(app_id.decode('ascii'), {}).get(op_id.decode('ascii'), "_parse_unknown_response")
+            parser = getattr(self, parser_name, self.__parse_unknown_response)
+            return parser(response)
     
+    def __handle_get_error_response(self, response):
+        pass
+
     def __parse_unknown_response(self, response):
         return {
             "message": "Unknown response format",
@@ -116,20 +123,24 @@ class WistomClient:
     ## Parses the login response into a human-readable format
     def _parse_login_response(self, response):        
         
-        result = { "login_result": response[-4:]}
-        print(result)
+        login_result = response[-4:]
         # command_name = next((key for key, value in COMMAND_ID.items() if value == command_id), "Unknown Command")
-        # login_result_name = next((key for key, value in LOGIN_RESULT.items() if value == login_result), "Unknown Login Result")
+        login_result_name = next((key for key, value in LOGIN_RESULT.items() if value == login_result), "Unknown Login Result")
 
-        return {
-            # "command_id": command_id,
-            # "token": token,
-            # "login_result": login_result_name,
-        }
+        return login_result_name
     
 
     def _parse_smgr_info_response(self, response):
-        strings = response.split(b'\x00')
+        header = {"cid": response[0:2].hex(),
+                  "token": int.from_bytes(response[2:4], 'big'),
+                  "app_id": response[4:8].decode('ascii'),
+                  "op_id": response[8:12].decode('ascii'),
+                  "data_length": int.from_bytes(response[12:16], 'big'),
+        }
+
+        
+
+        strings = response[16:].split(b'\x00')
         # Skipping tag bytes (might need to change this later)
         hw_product_number = strings[0][1:].decode('ascii')
         hw_id_number = strings[1][1:].decode('ascii')
@@ -156,6 +167,7 @@ class WistomClient:
         end_temp_calib = struct.unpack('>f', response[start_index + 24:start_index + 28])[0]  # FLOAT32
 
         return {
+            ""
             "hw_product_number": hw_product_number,
             "hw_id_number": hw_id_number,
             "hw_revision": hw_revision,
