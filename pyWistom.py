@@ -1,5 +1,5 @@
 import socket
-from struct import unpack
+import struct
 
 from wistomconstants import *
 from wistomconfig import HOST, PORT, USER_ID, PASSWORD
