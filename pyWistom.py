@@ -46,6 +46,11 @@ class WistomClient:
         response = self.__send_request(cid, app_id, op_id, data)
         return self._parse_login_response(response)
     
+    # API Commands
+
+    def get_smgr_info(self):
+        self.__increment_token()
+        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'INFO', b'')
 
 
     ## Helper methods
