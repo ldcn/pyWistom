@@ -35,9 +35,16 @@ class WistomClient:
 
     ## Login method
     def login(self):
-        payload = self.__create_login_payload()
-        response = self.__send_request(payload)
-        return self.__parse_login_response(response)
+        # payload = self.__create_login_payload()
+        cid = COMMAND_ID['LOGIN']
+        app_id = b'LGIN'
+        op_id = b'API2'
+        user_id_bytes = self.user_id.encode('ascii')
+        password_bytes = self.password.encode('ascii')
+        data = (user_id_bytes + b'\x00' 
+                   + password_bytes + b'\x00')
+        response = self.__send_request(cid, app_id, op_id, data)
+        return self._parse_login_response(response)
     
 
 
