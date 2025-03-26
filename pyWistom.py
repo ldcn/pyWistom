@@ -54,7 +54,18 @@ class WistomClient:
             raise ConnectionError("Not connected to server")
         self.socket.sendall(payload)
         response = self.socket.recv(4096) ## Test all possible Wistom API requests
-        return response
+        return self.__handle_response(app_id, op_id, response)
+    
+    def __handle_response(self, app_id, op_id, response):
+        parser_name = RESPONSE_PARSER.get(app_id.decode('ascii'), {}).get(op_id.decode('ascii'), "_parse_unknown_response")
+        parser = getattr(self, parser_name, self.__parse_unknown_response)
+        return parser(response)
+    
+    def __parse_unknown_response(self, response):
+        return {
+            "message": "Unknown response format",
+            "data": response.hex(),
+        }
     
     def __increment_token(self):
         self.token += 1
