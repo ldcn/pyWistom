@@ -52,9 +52,27 @@ class WistomClient:
         self.__increment_token()
         return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'INFO', b'')
 
+    ##################
+    ## Private methods
 
     ## Helper methods
-    def __send_request(self, payload):
+    def __make_request(self, cid, app_id, op_id, data):
+        data_length = len(data)
+        return self.__send_request(cid
+                                   + self.token.to_bytes(2, 'big') 
+                                   + app_id 
+                                   + op_id 
+                                   + data_length.to_bytes(4, 'big') 
+                                   + data)
+
+    def __send_request(self, cid, app_id, op_id, data):
+        data_length = len(data)
+        payload = (cid 
+                   + self.token.to_bytes(2, 'big')
+                   + app_id
+                   + op_id
+                   + data_length.to_bytes(4, 'big')
+                   + data)
         if not self.socket:
             raise ConnectionError("Not connected to server")
         self.socket.sendall(payload)
@@ -75,8 +93,6 @@ class WistomClient:
     def __increment_token(self):
         self.token += 1
         return self.token
-    
-    ## Private methods
 
     ## Creates the login payload as described in Page 74 Table 11-2
     ## of the Wistom User Guide
@@ -98,19 +114,72 @@ class WistomClient:
         )
     
     ## Parses the login response into a human-readable format
-    def __parse_login_response(self, response):
-        command_id = response[0:2]
-        token = int.from_bytes(response[2:4], 'big')
-        payload_length = int.from_bytes(response[12:16], 'big')
-        login_result = response[16:16 + payload_length]
+    def _parse_login_response(self, response):
+        print(response)
+        # command_id = response[:2]
+        # print(command_id)
+        # token = int.from_bytes(response[2:4], 'big')
+        # payload_length = int.from_bytes(response[12:16], 'big')
+        # login_result = response[16:16 + payload_length]
 
-        command_name = next((key for key, value in COMMAND_ID.items() if value == command_id), "Unknown Command")
-        login_result_name = next((key for key, value in LOGIN_RESULT.items() if value == login_result), "Unknown Login Result")
+        # command_name = next((key for key, value in COMMAND_ID.items() if value == command_id), "Unknown Command")
+        # login_result_name = next((key for key, value in LOGIN_RESULT.items() if value == login_result), "Unknown Login Result")
 
         return {
-            "command_id": command_name,
-            "token": token,
-            "login_result": login_result_name
+            # "command_id": command_id,
+            # "token": token,
+            # "login_result": login_result_name,
+        }
+    
+    
+    def _parse_smgr_info_response(self, response):
+        strings = response.split(b'\x00')
+        # Skipping tag bytes (might need to change this later)
+        hw_product_number = strings[0][1:].decode('ascii')
+        hw_id_number = strings[1][1:].decode('ascii')
+        hw_revision = strings[2][1:].decode('ascii')
+        hw_serial_number = strings[3][1:].decode('ascii')
+        sensor_product_number = strings[4][1:].decode('ascii')
+        sensor_id_number = strings[5][1:].decode('ascii')
+        sensor_revision = strings[6][1:].decode('ascii')
+        sensor_serial_number = strings[7][1:].decode('ascii')
+        software_product_number = strings[8][1:].decode('ascii')
+        software_revision = strings[9][1:].decode('ascii')
+        firmware_revision = strings[10][1:].decode('ascii')
+        pld_revision = strings[11][1:].decode('ascii')
+        bootstrap_revision = strings[12][1:].decode('ascii')
+        switch_software_revision = strings[13][1:].decode('ascii')
+        unit_serial = strings[14][1:].decode('ascii')
+        production_date = strings[15][1:].decode('ascii')
+
+        start_index = sum(len(s) + 1 for s in strings[:16])  # +1 for each null character
+
+        start_calib_freq = struct.unpack('>d', response[start_index + 1:start_index + 9])[0]  # FLOAT64
+        end_calib_freq = struct.unpack('>d', response[start_index + 10:start_index + 18])[0]  # FLOAT64
+        start_temp_calib = struct.unpack('>f', response[start_index + 19:start_index + 23])[0]  # FLOAT32
+        end_temp_calib = struct.unpack('>f', response[start_index + 24:start_index + 28])[0]  # FLOAT32
+
+        return {
+            "hw_product_number": hw_product_number,
+            "hw_id_number": hw_id_number,
+            "hw_revision": hw_revision,
+            "hw_serial_number": hw_serial_number,
+            "sensor_product_number": sensor_product_number,
+            "sensor_id_number": sensor_id_number,
+            "sensor_revision": sensor_revision,
+            "sensor_serial_number": sensor_serial_number,
+            "software_product_number": software_product_number,
+            "software_revision": software_revision,
+            "firmware_revision": firmware_revision,
+            "pld_revision": pld_revision,
+            "bootstrap_revision": bootstrap_revision,
+            "switch_software_revision": switch_software_revision,
+            "unit_serial": unit_serial,
+            "production_date": production_date,
+            "start_calib_freq": start_calib_freq,
+            "end_calib_freq": end_calib_freq,
+            "start_temp_calib": start_temp_calib,
+            "end_temp_calib": end_temp_calib,
         }
 
 if __name__ == "__main__":
