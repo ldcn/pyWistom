@@ -38,3 +38,52 @@ LOGIN_RESULT = {
     "WRONG_PASSWORD": b'\x10\x00\x00\x07',
     "USER_NOT_FOUND": b'\x10\x00\x00\x08',
 }
+
+## Response parsers for GET requests
+##
+## Commands that have no GET response (SET only) are included for error handling
+## See API documentation or page 83-112 in the Wistom User Guide
+
+RESPONSE_PARSER = {
+    "LGIN": {
+        "LGIN": "_parse_login_response",
+        "API2": "_parse_login_response",
+        "CPWD": "", # SET only
+        "COPW": "", # SET only
+        "UADD": "", # SET only
+        "UDEL": "", # SET only
+        "UINF": "_parse_login_user_info_response",
+        "SINF": "_parse_login_session_info_response", 
+    },
+
+    "ALMH": {
+        # Alarm handler operations here
+    },
+
+    "OPM#": {
+        # OPM operations here
+    },
+
+    "SMGR": { # System Manager operations
+        "REST": "", # SET only
+        "IP##": "_parse_smgr_ip_response",
+        "FLSH": "", # SET only
+        "SER#": "_parse_smgr_serial_response",
+        "TIME": "_parse_smgr_time_response",
+        "INFO": "_parse_smgr_info_response",
+        "TEMP": "_parse_smgr_temp_response",
+        "DUMP": "_parse_smgr_dump_response",
+        "CLRD": "", # SET only
+        "UPTI": "_parse_smgr_uptime_response",
+        "INST": "_parse_smgr_inst_response",
+        "SCFG": "_parse_smgr_scfg_response",
+        "SATR": "", # SET only
+        "SDTR": "", # SET only
+        "SLTR": "_parse_smgr_sltr_response",
+        "LED#": "_parse_smgr_led_response", # Not implemented
+    },
+
+    "SPEC": {
+        # Spectrum parameter operations here
+    },
+}
