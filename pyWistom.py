@@ -114,14 +114,10 @@ class WistomClient:
         )
     
     ## Parses the login response into a human-readable format
-    def _parse_login_response(self, response):
-        print(response)
-        # command_id = response[:2]
-        # print(command_id)
-        # token = int.from_bytes(response[2:4], 'big')
-        # payload_length = int.from_bytes(response[12:16], 'big')
-        # login_result = response[16:16 + payload_length]
-
+    def _parse_login_response(self, response):        
+        
+        result = { "login_result": response[-4:]}
+        print(result)
         # command_name = next((key for key, value in COMMAND_ID.items() if value == command_id), "Unknown Command")
         # login_result_name = next((key for key, value in LOGIN_RESULT.items() if value == login_result), "Unknown Login Result")
 
@@ -131,7 +127,7 @@ class WistomClient:
             # "login_result": login_result_name,
         }
     
-    
+
     def _parse_smgr_info_response(self, response):
         strings = response.split(b'\x00')
         # Skipping tag bytes (might need to change this later)
