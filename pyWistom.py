@@ -51,6 +51,10 @@ class WistomClient:
     def get_smgr_info(self):
         self.__increment_token()
         return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'INFO', b'')
+    
+    def custom_api_request(self, command_id, app_id, op_id, data):
+        self.__increment_token()
+        return self.__send_request(command_id, app_id, op_id, data)
 
     ##################
     ## Private methods
@@ -83,9 +87,15 @@ class WistomClient:
         pass
 
     def __parse_unknown_response(self, response):
+        header = {"cid": response[0:2].hex(),
+                  "token": int.from_bytes(response[2:4], 'big'),
+                  "app_id": response[4:8].decode('ascii'),
+                  "op_id": response[8:12].decode('ascii'),
+                  "data_length": int.from_bytes(response[12:16], 'big'),
+        }        
         return {
-            "message": "Unknown response format",
-            "data": response.hex(),
+            "header": header,
+            "data": response[16:].hex(),
         }
     
     def __increment_token(self):
