@@ -45,6 +45,7 @@ class WistomClient:
         data = (user_id_bytes + b'\x00' 
                    + password_bytes + b'\x00')
         return self.__send_request(cid, app_id, op_id, data)
+        # return self._parse_apiv2_login_response(response)
     
     # API Commands
 
@@ -56,15 +57,6 @@ class WistomClient:
     ## Private methods
 
     ## Helper methods
-    def __make_request(self, cid, app_id, op_id, data):
-        data_length = len(data)
-        return self.__send_request(cid
-                                   + self.token.to_bytes(2, 'big') 
-                                   + app_id 
-                                   + op_id 
-                                   + data_length.to_bytes(4, 'big') 
-                                   + data)
-
     def __send_request(self, cid, app_id, op_id, data):
         data_length = len(data)
         payload = (cid 
@@ -103,22 +95,6 @@ class WistomClient:
 
     ## Creates the login payload as described in Page 74 Table 11-2
     ## of the Wistom User Guide
-    def __create_login_payload(self):
-        user_id_bytes = self.user_id.encode('ascii')
-        password_bytes = self.password.encode('ascii')
-        payload_length = (len(user_id_bytes) 
-                          + len(password_bytes) 
-                          + 2) # add two bytes for the null-terminators
-        payload = (user_id_bytes + b'\x00' 
-                   + password_bytes + b'\x00')
-        return (
-            COMMAND_ID['LOGIN']
-            + self.token.to_bytes(2, 'big')
-            + b'LGIN'
-            + b'API2'
-            + payload_length.to_bytes(4, 'big')
-            + payload
-        )
     
     ## Parses the login response into a human-readable format
     def _parse_apiv2_login_response(self, response):        
