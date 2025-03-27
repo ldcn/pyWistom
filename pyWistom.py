@@ -144,7 +144,21 @@ class WistomClient:
         return {
             "SET Not acknowledged": f"{app_id} {op_id}",
             "Token": f"{token}",
-            "Error": ERROR_CODE[error_code],
+            "Error code": ERROR_CODE[error_code],
+            "Tag number": int.from_bytes(tag_number, 'big') if tag_number != b'\x00\x00' else None
+        } 
+    
+    def _parse_geterr_header(self, response):
+        token = int.from_bytes(response[2:4], 'big')
+        app_id = response[4:8].decode('ascii')
+        op_id = response[8:12].decode('ascii')
+        error_code = response[-2:]
+        tag_number = response[-4:-2]
+        
+        return {
+            "GET Error": f"{app_id} {op_id}",
+            "Token": f"{token}",
+            "Error code": ERROR_CODE[error_code],
             "Tag number": int.from_bytes(tag_number, 'big') if tag_number != b'\x00\x00' else None
         } 
 
