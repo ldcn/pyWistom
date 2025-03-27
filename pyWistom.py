@@ -170,6 +170,32 @@ class WistomClient:
                 "command_id": command_name,
                 "login_result": login_result_name
                 }
+    
+    ###################################################################
+    ## Parsers for getRes responses                                  ##
+    ## For reference, see Wistom API documentation (document 100051) ##
+    ###################################################################
+
+    def _parse_smgr_ip_response(self, response):
+        strings = response[16:].split(b'\x00')
+        # Skipping tag bytes...
+        ip_address = strings[0][1:].decode('ascii')
+        subnet_mask = strings[1][1:].decode('ascii')
+        gateway_address = strings[2][1:].decode('ascii')
+        host_name = strings[3][1:].decode('ascii')
+        mac_address = strings[4][1:].decode('ascii')
+        listening_port = int.from_bytes(strings[5][1:], 'big')
+
+        return {
+            "ip_address": ip_address,
+            "subnet_mask": subnet_mask,
+            "gateway_address": gateway_address,
+            "host_name": host_name,
+            "mac_address": mac_address,
+            "listening_port": listening_port,
+        }
+
+
 
     def _parse_smgr_info_response(self, response):
         strings = response[16:].split(b'\x00')
