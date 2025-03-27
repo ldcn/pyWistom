@@ -45,6 +45,13 @@ LOGIN_RESULT = {
 ## See API documentation or page 83-112 in the Wistom User Guide
 
 RESPONSE_PARSER = {
+    # The "LGIN" app-id is used both for logging into a wistom unit and when logged in
+    # When logging in, the op-id "API2" will use API v2 responses,
+    # while any other 4-letter combination will use API v1.
+    # However "LGIN" is the op-id used in all proximion software.
+    #
+    # After login, the app-id "LGIN" will work with the other op-ids
+    # that are shown below.
     "LGIN": {
         "LGIN": "_parse_apiv1_login_response",
         "API2": "_parse_apiv2_login_response",
