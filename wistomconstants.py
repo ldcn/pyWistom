@@ -81,13 +81,29 @@ RESPONSE_PARSER = {
 
     "OPM#": {
         # OPM operations here
+        "AVRG": "_parse_opm_averages_response",
+        "ENAB": "_parse_opm_enable_response",
+        "CALC": "_parse_opm_power_calc_response",
+        "OSNR": "_parse_opm_osnr_config_response",
+        "CHCO": "_parse_opm_channel_config_response",
+        "FRQO": "_parse_opm_frequency_option_response",
+        "FSPC": "_parse_opm_frequency_spectrum_response",
+        "WSPC": "_parse_opm_wavelength_spectrum_response",
+        "CHNL": "_parse_opm_channel_status_response",
+        "CHAL": "_parse_opm_all_channels_status_response",
+        "TRSH": "_parse_opm_threshold_response",
+        "MINL": "_parse_opm_min_level_response",
+        "PCRI": "_parse_opm_peak_criteria_response",
+        "TPWR": "_parse_opm_total_power_response",
+        "FILW": "_parse_opm_filter_width_response",
+        "SWHA": "_parse_opm_switch_handling_response",
     },
 
     "SMGR": { # System Manager operations
         "REST": "", # SET only
         "IP##": "_parse_smgr_ip_response",
         "FLSH": "", # SET only
-        "SER#": "_parse_smgr_serial_response",
+        "SER#": "_parse_smgr_serial_response", # not functional
         "TIME": "_parse_smgr_time_response",
         "INFO": "_parse_smgr_info_response",
         "TEMP": "_parse_smgr_temp_response",
