@@ -105,34 +105,17 @@ class WistomClient:
         }
 
     def __parse_unknown_response(self, response):
-      
         return response[16:].hex()
 
-    def _parse_getres_header(self, response):
+    def _parse_setack_header(self, response):
         token = int.from_bytes(response[2:4], 'big')
         app_id = response[4:8].decode('ascii')
         op_id = response[8:12].decode('ascii')
-
+        
         return {
-            "GET Response": f"{app_id} {op_id}",
-            "Token": f"{token}"
-        }
-          
-    def __increment_token(self):
-        self.token += 1
-        return self.token
-    
-    ## Parses the login response into a human-readable format
-    def _parse_apiv2_login_response(self, response):        
-        command_id = response[0:2]
-        login_result = response[-4:]
-        command_name = next((key for key, value in COMMAND_ID.items() if value == command_id), "Unknown Command")
-        login_result_name = next((key for key, value in LOGIN_RESULT.items() if value == login_result), "Unknown Login Result")
-
-        return {
-                "command_id": command_name,
-                "login_result": login_result_name
-                }
+            "SET Acknowledged": f"{app_id} {op_id}",
+            "Token": f"{token}",
+        } 
     
     def _parse_setnack_header(self, response):
         token = int.from_bytes(response[2:4], 'big')
@@ -161,6 +144,32 @@ class WistomClient:
             "Error code": ERROR_CODE[error_code],
             "Tag number": int.from_bytes(tag_number, 'big') if tag_number != b'\x00\x00' else None
         } 
+
+    def _parse_getres_header(self, response):
+        token = int.from_bytes(response[2:4], 'big')
+        app_id = response[4:8].decode('ascii')
+        op_id = response[8:12].decode('ascii')
+
+        return {
+            "GET Response": f"{app_id} {op_id}",
+            "Token": f"{token}"
+        }
+          
+    def __increment_token(self):
+        self.token += 1
+        return self.token
+    
+    ## Parses the login response into a human-readable format
+    def _parse_apiv2_login_response(self, response):        
+        command_id = response[0:2]
+        login_result = response[-4:]
+        command_name = next((key for key, value in COMMAND_ID.items() if value == command_id), "Unknown Command")
+        login_result_name = next((key for key, value in LOGIN_RESULT.items() if value == login_result), "Unknown Login Result")
+
+        return {
+                "command_id": command_name,
+                "login_result": login_result_name
+                }
 
     def _parse_smgr_info_response(self, response):
         header = {"cid": response[0:2].hex(),
