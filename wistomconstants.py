@@ -39,6 +39,18 @@ LOGIN_RESULT = {
     "USER_NOT_FOUND": b'\x10\x00\x00\x08',
 }
 
+## Parsers for response headers
+## Header structure is dependent on the command id
+
+RESPONSE_HEADER_PARSER = {
+    COMMAND_ID["LOGINRES"]: "_parse_loginres_header",
+    COMMAND_ID["SETACK"]: "_parse_setack_header",
+    COMMAND_ID["SETNACK"]: "_parse_setnack_header",
+    COMMAND_ID["GETERR"]: "_parse_geterr_header",
+    COMMAND_ID["GETRES"]: "_parse_getres_header",
+}
+
+
 ## Response parsers for GET requests
 ##
 ## Commands that have no GET response (SET only) are included for error handling
