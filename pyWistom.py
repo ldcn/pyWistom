@@ -76,17 +76,20 @@ class WistomClient:
     
     def __handle_response(self, app_id, op_id, response):
         cid = response[0:2]
-        if cid == COMMAND_ID['GETERR']:
-            return self.__handle_get_error_response(response)
-        else:
-            parser_name = RESPONSE_PARSER.get(app_id.decode('ascii'), {}).get(op_id.decode('ascii'), "_parse_unknown_response")
-            parser = getattr(self, parser_name, self.__parse_unknown_response)
-            return parser(response)
-    
-    def __handle_get_error_response(self, response):
-        pass
+        header_parser_name = RESPONSE_HEADER_PARSER.get(cid, "__parse_unknown_command")
+        header_parser = getattr(self, header_parser_name, self.__parse_unknown_command)
+        parsed_header = header_parser(response)
 
-    def __parse_unknown_response(self, response):
+        parser_name = RESPONSE_PARSER.get(app_id.decode('ascii'), {}).get(op_id.decode('ascii'), "_parse_unknown_response")
+        parser = getattr(self, parser_name, self.__parse_unknown_response)
+        parsed_response = parser(response)
+
+        return {
+            "header": parsed_header,
+            "response": parsed_response,
+        }
+    
+    def __parse_unknown_command(self, response):
         header = {"cid": response[0:2].hex(),
                   "token": int.from_bytes(response[2:4], 'big'),
                   "app_id": response[4:8].decode('ascii'),
