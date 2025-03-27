@@ -79,24 +79,30 @@ class WistomClient:
         header_parser_name = RESPONSE_HEADER_PARSER.get(cid, "__parse_unknown_command")
         header_parser = getattr(self, header_parser_name, self.__parse_unknown_command)
         parsed_header = header_parser(response)
+        
+        if cid == COMMAND_ID["GETRES"]:
+            parser_name = RESPONSE_PARSER.get(app_id.decode('ascii'), {}).get(op_id.decode('ascii'), "_parse_unknown_response")
+            parser = getattr(self, parser_name, self.__parse_unknown_response)
+            parsed_response = parser(response)
 
-        parser_name = RESPONSE_PARSER.get(app_id.decode('ascii'), {}).get(op_id.decode('ascii'), "_parse_unknown_response")
-        parser = getattr(self, parser_name, self.__parse_unknown_response)
-        parsed_response = parser(response)
-
-        return {
-            "header": parsed_header,
-            "response": parsed_response,
-        }
+            return {
+                "header": parsed_header,
+                "response": parsed_response,
+            }
+        else: return parsed_header
     
     def __parse_unknown_command(self, response):
+        print(f"Unknown command: {response[0:2].hex()}")
         header = {"cid": response[0:2].hex(),
                   "token": int.from_bytes(response[2:4], 'big'),
                   "app_id": response[4:8].decode('ascii'),
                   "op_id": response[8:12].decode('ascii'),
                   "data_length": int.from_bytes(response[12:16], 'big'),
         }          
-        return header
+        return {
+            "header": header,
+            "response": self.__parse_unknown_response(response),
+        }
 
     def __parse_unknown_response(self, response):
       
@@ -127,6 +133,20 @@ class WistomClient:
                 "command_id": command_name,
                 "login_result": login_result_name
                 }
+    
+    def _parse_setnack_header(self, response):
+        token = int.from_bytes(response[2:4], 'big')
+        app_id = response[4:8].decode('ascii')
+        op_id = response[8:12].decode('ascii')
+        error_code = response[-2:]
+        tag_number = response[-4:-2]
+        
+        return {
+            "SET Not acknowledged": f"{app_id} {op_id}",
+            "Token": f"{token}",
+            "Error": ERROR_CODE[error_code],
+            "Tag number": int.from_bytes(tag_number, 'big') if tag_number != b'\x00\x00' else None
+        } 
 
     def _parse_smgr_info_response(self, response):
         header = {"cid": response[0:2].hex(),
