@@ -46,8 +46,8 @@ LOGIN_RESULT = {
 
 RESPONSE_PARSER = {
     "LGIN": {
-        "LGIN": "_parse_login_response",
-        "API2": "_parse_login_response",
+        "LGIN": "_parse_apiv1_login_response",
+        "API2": "_parse_apiv2_login_response",
         "CPWD": "", # SET only
         "COPW": "", # SET only
         "UADD": "", # SET only
