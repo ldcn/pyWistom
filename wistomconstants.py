@@ -106,3 +106,24 @@ RESPONSE_PARSER = {
         # Spectrum parameter operations here
     },
 }
+
+ERROR_CODE = {
+    b'\x00\x00': "No error", # this "error" is in the api documentation
+    b'\x00\x01': "Unknown error",
+    b'\x00\x02': "No response",
+    b'\x00\x03': "Request failed",
+    b'\x00\x04': "Illegal application ID",
+    b'\x00\x05': "Illegal operation ID",
+    b'\x00\x06': "Illegal tag",
+    b'\x00\x07': "Mandatory missing tags",
+    b'\x00\x08': "Tag value too low",
+    b'\x00\x09': "Tag value too high",
+    b'\x00\x0a': "Invalid value",
+    b'\x00\x0b': "Length mismatch",
+    b'\x00\x0c': "Not initialized",
+    b'\x00\x0d': "Invalid configuration",
+    b'\x00\x0e': "Out of resources",
+    b'\x00\x0f': "User level restriction",
+    b'\x00\x10': "Operation not available for GET",
+    b'\x00\x11': "Operation not available for SET",
+}
