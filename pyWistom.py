@@ -76,7 +76,6 @@ class WistomClient:
     
     def __handle_response(self, app_id, op_id, response):
         cid = response[0:2]
-        print(cid)
         header_parser_name = RESPONSE_HEADER_PARSER.get(cid, "__parse_unknown_command")
         header_parser = getattr(self, header_parser_name, self.__parse_unknown_command)
         parsed_header = header_parser(response)
