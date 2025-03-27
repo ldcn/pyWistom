@@ -218,9 +218,25 @@ class WistomClient:
             "mac_address": mac_address,
             "listening_port": listening_port,
         }
+    
+    def _parse_smgr_time_response(self, response):
+        
+        year = int.from_bytes(response[17:19], 'big')
+        month = int.from_bytes(response[20:21], 'big')
+        day = int.from_bytes(response[22:23], 'big')
+        hours = int.from_bytes(response[24:25], 'big')
+        minutes = int.from_bytes(response[26:27], 'big')
+        seconds = int.from_bytes(response[28:29], 'big')
 
-
-
+        return {
+            "year": year,
+            "month": month,
+            "day": day,
+            "hours": hours,
+            "minutes": minutes,
+            "seconds": seconds,
+        }
+    
     def _parse_smgr_info_response(self, response):
         strings = response[16:].split(b'\x00')
         # Skipping tag bytes (might need to change this later)
