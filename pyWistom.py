@@ -140,7 +140,6 @@ class WistomClient:
         end_temp_calib = struct.unpack('>f', response[start_index + 24:start_index + 28])[0]  # FLOAT32
 
         return {
-            ""
             "hw_product_number": hw_product_number,
             "hw_id_number": hw_id_number,
             "hw_revision": hw_revision,
