@@ -76,6 +76,7 @@ class WistomClient:
     
     def __handle_response(self, app_id, op_id, response):
         cid = response[0:2]
+        print(cid)
         header_parser_name = RESPONSE_HEADER_PARSER.get(cid, "__parse_unknown_command")
         header_parser = getattr(self, header_parser_name, self.__parse_unknown_command)
         parsed_header = header_parser(response)
@@ -95,11 +96,23 @@ class WistomClient:
                   "app_id": response[4:8].decode('ascii'),
                   "op_id": response[8:12].decode('ascii'),
                   "data_length": int.from_bytes(response[12:16], 'big'),
-        }        
+        }          
+        return header
+
+    def __parse_unknown_response(self, response):
+      
+        return response[16:].hex()
+
+    def _parse_getres_header(self, response):
+        token = int.from_bytes(response[2:4], 'big')
+        app_id = response[4:8].decode('ascii')
+        op_id = response[8:12].decode('ascii')
+
         return {
-            "header": header,
-            "data": response[16:].hex(),
+            "GET Response": f"{app_id} {op_id}",
+            "Token": f"{token}"
         }
+        
     
     def __increment_token(self):
         self.token += 1
