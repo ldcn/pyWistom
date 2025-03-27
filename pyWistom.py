@@ -172,13 +172,6 @@ class WistomClient:
                 }
 
     def _parse_smgr_info_response(self, response):
-        header = {"cid": response[0:2].hex(),
-                  "token": int.from_bytes(response[2:4], 'big'),
-                  "app_id": response[4:8].decode('ascii'),
-                  "op_id": response[8:12].decode('ascii'),
-                  "data_length": int.from_bytes(response[12:16], 'big'),
-        }
-
         strings = response[16:].split(b'\x00')
         # Skipping tag bytes (might need to change this later)
         hw_product_number = strings[0][1:].decode('ascii')
