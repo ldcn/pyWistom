@@ -200,7 +200,7 @@ class WistomClient:
     ## For reference, see Wistom API documentation (document 100051) ##
     ###################################################################
 
-    def _parse_smgr_ip_response(self, response):
+    def _parse_smgr_network_info_response(self, response):
         strings = response[16:].split(b'\x00')
         # Skipping tag bytes...
         ip_address = strings[0][1:].decode('ascii')
