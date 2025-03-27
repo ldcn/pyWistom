@@ -51,6 +51,30 @@ class WistomClient:
     def get_smgr_info(self):
         self.__increment_token()
         return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'INFO', b'')
+
+    def get_smgr_network_info(self):
+        self.__increment_token()
+        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'IP##', b'')
+    
+    def get_smgr_time(self):
+        self.__increment_token()
+        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'TIME', b'')
+    
+    def get_smgr_temp(self):
+        self.__increment_token()
+        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'TEMP', b'')
+    
+    def get_smgr_uptime(self):
+        self.__increment_token()
+        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'UPTI', b'')
+    
+    def get_snmp_agent_listening_port(self):
+        self.__increment_token()
+        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'SCFG', b'')
+    
+    def get_snmp_trap_receivers(self):
+        self.__increment_token()
+        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'SLTR', b'')
     
     def custom_api_request(self, command_id, app_id, op_id, data):
         self.__increment_token()
