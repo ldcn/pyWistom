@@ -111,8 +111,7 @@ class WistomClient:
             "GET Response": f"{app_id} {op_id}",
             "Token": f"{token}"
         }
-        
-    
+          
     def __increment_token(self):
         self.token += 1
         return self.token
@@ -128,7 +127,6 @@ class WistomClient:
                 "command_id": command_name,
                 "login_result": login_result_name
                 }
-    
 
     def _parse_smgr_info_response(self, response):
         header = {"cid": response[0:2].hex(),
@@ -137,8 +135,6 @@ class WistomClient:
                   "op_id": response[8:12].decode('ascii'),
                   "data_length": int.from_bytes(response[12:16], 'big'),
         }
-
-        
 
         strings = response[16:].split(b'\x00')
         # Skipping tag bytes (might need to change this later)
