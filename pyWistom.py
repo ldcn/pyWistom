@@ -34,8 +34,9 @@ class WistomClient:
         self.disconnect()
 
     ## Login method
+    ## Creates the login payload as described in Page 74 Table 11-2
+    ## of the Wistom User Guide
     def login(self):
-        # payload = self.__create_login_payload()
         cid = COMMAND_ID['LOGIN']
         app_id = b'LGIN'
         op_id = API_VERSION.encode('ascii')
@@ -45,7 +46,6 @@ class WistomClient:
         data = (user_id_bytes + b'\x00' 
                    + password_bytes + b'\x00')
         return self.__send_request(cid, app_id, op_id, data)
-        # return self._parse_apiv2_login_response(response)
     
     # API Commands
 
@@ -92,9 +92,6 @@ class WistomClient:
     def __increment_token(self):
         self.token += 1
         return self.token
-
-    ## Creates the login payload as described in Page 74 Table 11-2
-    ## of the Wistom User Guide
     
     ## Parses the login response into a human-readable format
     def _parse_apiv2_login_response(self, response):        
