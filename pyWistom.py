@@ -121,7 +121,7 @@ class WistomClient:
         )
     
     ## Parses the login response into a human-readable format
-    def _parse_login_response(self, response):        
+    def _parse_apiv2_login_response(self, response):        
         
         login_result = response[-4:]
         # command_name = next((key for key, value in COMMAND_ID.items() if value == command_id), "Unknown Command")
