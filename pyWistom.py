@@ -40,7 +40,6 @@ class WistomClient:
         cid = COMMAND_ID['LOGIN']
         app_id = b'LGIN'
         op_id = API_VERSION.encode('ascii')
-        print(op_id)
         user_id_bytes = self.user_id.encode('ascii')
         password_bytes = self.password.encode('ascii')
         data = (user_id_bytes + b'\x00' 
@@ -95,12 +94,15 @@ class WistomClient:
     
     ## Parses the login response into a human-readable format
     def _parse_apiv2_login_response(self, response):        
-        
+        command_id = response[0:2]
         login_result = response[-4:]
-        # command_name = next((key for key, value in COMMAND_ID.items() if value == command_id), "Unknown Command")
+        command_name = next((key for key, value in COMMAND_ID.items() if value == command_id), "Unknown Command")
         login_result_name = next((key for key, value in LOGIN_RESULT.items() if value == login_result), "Unknown Login Result")
 
-        return login_result_name
+        return {
+                "command_id": command_name,
+                "login_result": login_result_name
+                }
     
 
     def _parse_smgr_info_response(self, response):
