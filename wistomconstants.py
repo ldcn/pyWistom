@@ -101,7 +101,7 @@ RESPONSE_PARSER = {
 
     "SMGR": { # System Manager operations
         "REST": "", # SET only
-        "IP##": "_parse_smgr_ip_response",
+        "IP##": "_parse_smgr_network_info_response",
         "FLSH": "", # SET only
         "SER#": "_parse_smgr_serial_response", # not functional
         "TIME": "_parse_smgr_time_response",
