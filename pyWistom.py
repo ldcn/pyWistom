@@ -38,13 +38,13 @@ class WistomClient:
         # payload = self.__create_login_payload()
         cid = COMMAND_ID['LOGIN']
         app_id = b'LGIN'
-        op_id = b'API2'
+        op_id = API_VERSION.encode('ascii')
+        print(op_id)
         user_id_bytes = self.user_id.encode('ascii')
         password_bytes = self.password.encode('ascii')
         data = (user_id_bytes + b'\x00' 
                    + password_bytes + b'\x00')
-        response = self.__send_request(cid, app_id, op_id, data)
-        return self._parse_login_response(response)
+        return self.__send_request(cid, app_id, op_id, data)
     
     # API Commands
 
