@@ -204,7 +204,7 @@ class WistomClient:
     ## For reference, see Wistom API documentation (document 100051) ##
     ###################################################################
 
-    def _parse_smgr_network_info_response(self, response):
+    def _parse_network_info_response(self, response):
         strings = response[16:].split(b'\x00')
         # Skipping tag bytes...
         ip_address = strings[0][1:].decode('ascii')
@@ -223,7 +223,7 @@ class WistomClient:
             "listening_port": listening_port,
         }
     
-    def _parse_smgr_time_response(self, response):
+    def _parse_datetime_response(self, response):
         
         year = int.from_bytes(response[17:19], 'big')
         month = int.from_bytes(response[20:21], 'big')
@@ -241,13 +241,13 @@ class WistomClient:
             "seconds": seconds,
         }
     
-    def _parse_smgr_info_response(self, response):
-        strings = response[16:].split(b'\x00')
+    def _parse_product_info_response(self, response):
+        strings = response[16:].split(b'\x00', 16)[:-1]
         # Skipping tag bytes (might need to change this later)
-        hw_product_number = strings[0][1:].decode('ascii')
-        hw_id_number = strings[1][1:].decode('ascii')
-        hw_revision = strings[2][1:].decode('ascii')
-        hw_serial_number = strings[3][1:].decode('ascii')
+        hardware_product_number = strings[0][1:].decode('ascii')
+        hardware_id_number = strings[1][1:].decode('ascii')
+        hardware_revision = strings[2][1:].decode('ascii')
+        hardware_serial_number = strings[3][1:].decode('ascii')
         sensor_product_number = strings[4][1:].decode('ascii')
         sensor_id_number = strings[5][1:].decode('ascii')
         sensor_revision = strings[6][1:].decode('ascii')
@@ -263,16 +263,16 @@ class WistomClient:
 
         start_index = sum(len(s) + 1 for s in strings[:16])  # +1 for each null character
 
-        start_calib_freq = struct.unpack('>d', response[start_index + 1:start_index + 9])[0]  # FLOAT64
-        end_calib_freq = struct.unpack('>d', response[start_index + 10:start_index + 18])[0]  # FLOAT64
-        start_temp_calib = struct.unpack('>f', response[start_index + 19:start_index + 23])[0]  # FLOAT32
-        end_temp_calib = struct.unpack('>f', response[start_index + 24:start_index + 28])[0]  # FLOAT32
+        start_calibration_frequency = struct.unpack('>d', response[start_index + 1:start_index + 9])[0]
+        end_calibration_frequency = struct.unpack('>d', response[start_index + 10:start_index + 18])[0]
+        start_calibration_temperature = struct.unpack('>f', response[start_index + 19:start_index + 23])[0]
+        end_calibration_temperature = struct.unpack('>f', response[start_index + 24:start_index + 28])[0]
 
         return {
-            "hw_product_number": hw_product_number,
-            "hw_id_number": hw_id_number,
-            "hw_revision": hw_revision,
-            "hw_serial_number": hw_serial_number,
+            "hardware_product_number": hardware_product_number,
+            "hardware_id_number": hardware_id_number,
+            "hardware_revision": hardware_revision,
+            "hardware_serial_number": hardware_serial_number,
             "sensor_product_number": sensor_product_number,
             "sensor_id_number": sensor_id_number,
             "sensor_revision": sensor_revision,
@@ -285,13 +285,13 @@ class WistomClient:
             "switch_software_revision": switch_software_revision,
             "unit_serial": unit_serial,
             "production_date": production_date,
-            "start_calib_freq": start_calib_freq,
-            "end_calib_freq": end_calib_freq,
-            "start_temp_calib": start_temp_calib,
-            "end_temp_calib": end_temp_calib,
+            "start_calibration_frequency": start_calibration_frequency,
+            "end_calibration_frequency": end_calibration_frequency,
+            "start_calibration_temperature": start_calibration_temperature,
+            "end_calibration_temperature": end_calibration_temperature,
         }
     
-    def _parse_smgr_uptime_response(self, response):
+    def _parse_system_uptime_response(self, response):
         uptime = struct.unpack('>f', response[17:21])[0]
         app_uptime = struct.unpack('>f', response[22:26])[0]
         system_load = struct.unpack('>f', response[27:31])[0]
