@@ -101,20 +101,20 @@ RESPONSE_PARSER = {
 
     "SMGR": { # System Manager operations
         "REST": "", # SET only
-        "IP##": "_parse_smgr_network_info_response",
+        "IP##": "_parse_network_info_response",
         "FLSH": "", # SET only
         "SER#": "_parse_smgr_serial_response", # not functional
-        "TIME": "_parse_smgr_time_response",
-        "INFO": "_parse_smgr_info_response",
-        "TEMP": "_parse_smgr_temp_response",
+        "TIME": "_parse_datetime_response",
+        "INFO": "_parse_product_info_response",
+        "TEMP": "_parse_system_temperature_response",
         "DUMP": "_parse_smgr_dump_response",
         "CLRD": "", # SET only
-        "UPTI": "_parse_smgr_uptime_response",
+        "UPTI": "_parse_system_uptime_response",
         "INST": "_parse_smgr_inst_response",
-        "SCFG": "_parse_smgr_scfg_response",
+        "SCFG": "_parse_snmp_config_response",
         "SATR": "", # SET only
         "SDTR": "", # SET only
-        "SLTR": "_parse_smgr_sltr_response",
+        "SLTR": "_parse_list_snmp_trap_receivers_response",
         "LED#": "_parse_smgr_led_response", # Not implemented
     },
 
