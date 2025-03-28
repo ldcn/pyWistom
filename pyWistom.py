@@ -286,6 +286,18 @@ class WistomClient:
             "start_temp_calib": start_temp_calib,
             "end_temp_calib": end_temp_calib,
         }
+    
+    def _parse_smgr_uptime_response(self, response):
+        uptime = struct.unpack('>f', response[17:21])[0]
+        app_uptime = struct.unpack('>f', response[22:26])[0]
+        system_load = struct.unpack('>f', response[27:31])[0]
+
+        return {
+            "uptime": uptime,
+            "app_uptime": app_uptime,
+            "system_load": system_load,
+        }
+
 
 if __name__ == "__main__":
 
