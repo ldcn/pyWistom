@@ -133,8 +133,10 @@ class WistomClient:
         }
 
     def __parse_unknown_response(self, response):
-        return response[16:].hex()
-
+        return {
+            "bytes": response[16:],
+            "hex": response[16:].hex(),
+        }
     def _parse_setack_header(self, response):
         token = int.from_bytes(response[2:4], 'big')
         app_id = response[4:8].decode('ascii')
@@ -261,7 +263,7 @@ class WistomClient:
         unit_serial = strings[14][1:].decode('ascii')
         production_date = strings[15][1:].decode('ascii')
 
-        start_index = sum(len(s) + 1 for s in strings[:16])  # +1 for each null character
+        start_index = sum((len(s) + 2) for s in strings[:16])  # +1 for each null character and +1 for each tag
 
         start_calibration_frequency = struct.unpack('>d', response[start_index + 1:start_index + 9])[0]
         end_calibration_frequency = struct.unpack('>d', response[start_index + 10:start_index + 18])[0]
