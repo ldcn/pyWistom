@@ -301,7 +301,44 @@ class WistomClient:
             "app_uptime": app_uptime,
             "system_load": system_load,
         }
+    
+    def _parse_list_snmp_trap_receivers_response(self, response):
+        strings = response[16:].split(b'\x00')
+        trap_ip_address = strings[0][1:].decode('ascii')
+        trap_port = int.from_bytes(response[-2:], 'big')
 
+        return {
+            "trap_ip_address": trap_ip_address,
+            "trap_port": trap_port,
+        }
+    
+    def _parse_snmp_config_response(self, response):
+        agent_port = int.from_bytes(response[-2:], 'big')
+
+        return {
+            "agent_port": agent_port,
+        }
+    
+    def _parse_system_temperature_response(self, response):
+        board_temp = struct.unpack('>f', response[17:21])[0]
+        sensor_temp = struct.unpack('>f', response[22:26])[0]
+        sensor_temp_derivative = struct.unpack('>f', response[27:31])[0]
+        conf_min_temp = struct.unpack('>f', response[32:36])[0]
+        conf_max_temp = struct.unpack('>f', response[37:41])[0]
+
+        # The response gives this value twice due to a bug in the API
+        # conf_max_temp_2 = struct.unpack('>f', response[42:46])[0] 
+        fpga_temp = struct.unpack('>f', response[47:51])[0]
+
+        return {
+            "board_temp": board_temp,
+            "sensor_temp": sensor_temp,
+            "sensor_temp_derivative": sensor_temp_derivative,
+            "conf_min_temp": conf_min_temp,
+            "conf_max_temp": conf_max_temp,
+            # "conf_max_temp_2": conf_max_temp_2,
+            "fpga_temp": fpga_temp,
+        }
 
 if __name__ == "__main__":
 
