@@ -79,6 +79,10 @@ class WistomClient:
     def custom_api_request(self, command_id, app_id, op_id, data):
         self.__increment_token()
         return self.__send_request(command_id, app_id, op_id, data)
+    
+    def custom_api_request_raw(self, command_id, app_id, op_id, data):
+        self.__increment_token()
+        return self.__send_request(command_id, app_id, op_id, data)
 
     ##################
     ## Private methods
