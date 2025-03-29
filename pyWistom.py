@@ -108,7 +108,7 @@ class WistomClient:
         header_parser = getattr(self, header_parser_name, self.__parse_unknown_command)
         parsed_header = header_parser(response)
         
-        if cid == COMMAND_ID["GETRES"]:
+        if cid == (COMMAND_ID["GETRES"] or COMMAND_ID["LOGINRES"]):
             parser_name = RESPONSE_PARSER.get(app_id.decode('ascii'), {}).get(op_id.decode('ascii'), "_parse_unknown_response")
             parser = getattr(self, parser_name, self.__parse_unknown_response)
             parsed_response = parser(response)
@@ -137,6 +137,19 @@ class WistomClient:
             "bytes": response[16:],
             "hex": response[16:].hex(),
         }
+
+    def _parse_loginres_header(self, response):
+        token = int.from_bytes(response[2:4], 'big')
+        app_id = response[4:8].decode('ascii')
+        op_id = response[8:12].decode('ascii')
+        
+        return {
+            "Login result": f"{app_id} {op_id}",
+            "Token": f"{token}",
+        } 
+
+        pass
+
     def _parse_setack_header(self, response):
         token = int.from_bytes(response[2:4], 'big')
         app_id = response[4:8].decode('ascii')
