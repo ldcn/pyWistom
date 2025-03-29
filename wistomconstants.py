@@ -64,7 +64,7 @@ RESPONSE_PARSER = {
     #
     # After login, the app-id "LGIN" will work with the other op-ids
     # that are shown below.
-    "LGIN": {
+    "LGIN": { # Login / User management operations
         "LGIN": "_parse_apiv1_login_response",
         "API2": "_parse_apiv2_login_response",
         "CPWD": "", # SET only
@@ -121,6 +121,16 @@ RESPONSE_PARSER = {
     "SPEC": {
         # Spectrum parameter operations here
     },
+
+    "WSNS": { # Wistsense operations
+        "ENAB": "_parse_wistsense_enable",
+        "PORT": "_parse_wsns_port",
+        "DATA": "_parse_wsns_data",
+        "NEXT": "_parse_wsns_next",
+        "PARA": "_parse_wsns_para",
+        "FILT": "_parse_wsns_filt",
+        "RAWB": "_parse_wsns_rawb",
+    }
 }
 
 ERROR_CODE = {
@@ -143,3 +153,4 @@ ERROR_CODE = {
     b'\x00\x10': "Operation not available for GET",
     b'\x00\x11': "Operation not available for SET",
 }
+
