@@ -206,6 +206,49 @@ class WistomClient:
     ## For reference, see Wistom API documentation (document 100051) ##
     ###################################################################
 
+    def _parse_login_session_info_response(self, response):
+        
+        index = 0
+        logged_in_users = 0
+        data = response[16:]
+        parsed_data = {}
+
+        while index < len(data):
+            # read the username tag
+            if index + 1 > len(data):
+                break
+            tag_user = data[index]
+            index += 1
+
+            # Read the username
+            null_terminated_string_end = data.find(b'\x00', index)
+            if null_terminated_string_end == -1:
+                break
+            user_string = data[index:null_terminated_string_end].decode('ascii')
+            index += (null_terminated_string_end - index + 1)
+
+            # Read the process id tag
+            if index + 1 > len(data):
+                break
+            tag_pid = data[index]
+            index += 1
+
+            # Read the process id
+            if index + 4 > len(data):
+                break
+            pid = struct.unpack('>I', data[index:index + 4])[0]
+            index += 4
+
+            # parse the data
+            logged_in_users += 1
+            parsed_data[f"user_{logged_in_users}"] = user_string
+            parsed_data[f"process_id_{logged_in_users}"] = pid
+
+        return {
+            "logged_in_users": logged_in_users,
+            "users": parsed_data
+        }
+
     def _parse_network_info_response(self, response):
         strings = response[16:].split(b'\x00')
         # Skipping tag bytes...
@@ -340,6 +383,15 @@ class WistomClient:
             "conf_max_temp": conf_max_temp,
             # "conf_max_temp_2": conf_max_temp_2,
             "fpga_temp": fpga_temp,
+        }
+    
+    def _parse_smgr_inst_response(self, response):
+        snmp_installed = bool.from_bytes(response[17:18])
+        obsolete_installed = bool.from_bytes(response[19:20])
+
+        return {
+            "snmp_installed": snmp_installed,
+            "obsolete_installed": obsolete_installed,
         }
 
 if __name__ == "__main__":
