@@ -154,3 +154,46 @@ ERROR_CODE = {
     b'\x00\x11': "Operation not available for SET",
 }
 
+## Tag parsers 
+
+TAG_PARSER = {
+    "SPEC": {
+        "CHNL": {
+            b'\x01': "channel_id_map",
+            b'\x02': "channel_id",
+            b'\x64': "switch_port", # Appears in this order in the documentation 
+            b'\x03': "activate_mask",
+            b'\x04': "nominal_frequency",
+            b'\x05': "nominal_power",
+            b'\x06': "obsolete",
+            b'\x07': "obsolete",
+            b'\x08': "frequency_hysteresis",
+            b'\x09': "obsolete",
+            b'\x0a': "obsolete",
+            b'\x0b': "obsolete",
+            b'\x0c': "osnr_warning",
+            b'\x0d': "osnr_alarm",
+            b'\x0e': "osnr_hysteresis",
+            b'\x0f': "osnr_delta_frequency",
+            b'\x10': "opm_window",
+            b'\x11': "delta_power_high_warning",
+            b'\x12': "delta_power_low_warning",
+            b'\x13': "delta_power_high_alarm",
+            b'\x14': "delta_power_low_alarm",
+            b'\x15': "power_hysteresis",
+            b'\x16': "delta_frequency_high_warning",
+            b'\x17': "delta_frequency_low_warning",
+            b'\x18': "delta_frequency_high_alarm",
+            b'\x19': "delta_frequency_low_alarm",
+            b'\x1a': "integration_interval",
+            b'\x1b': "channel_description",
+        },
+        "DELC": {
+            b'\x02': "channel_id",
+        },
+        "CTBL": {
+            b'\x01': "num_channels",
+            b'\x02': "channel_table",
+        }
+    }
+}
