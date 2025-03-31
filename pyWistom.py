@@ -405,6 +405,22 @@ class WistomClient:
             "obsolete_installed": obsolete_installed,
         }
 
+    ###################################################################
+    ## Wistsense API function parsers                                ##
+    ## For reference, see Wistom API documentation (document 100051) ##
+    ###################################################################
+
+    def _parse_wsns_next(self, response):
+        peak_frequency = [16]
+        peak_frequency_tag = [16]
+        peak_frequency_tag[0] = response[16]
+        number_of_peaks = struct.unpack('>I', response[17:21])[0]
+        peak_frequency[0] = struct.unpack('>d', response[17+4:25+4])[0]
+
+        return {"number_of_peaks": number_of_peaks,
+                peak_frequency_tag[0]: peak_frequency[0],
+                }
+
 if __name__ == "__main__":
 
     print(f"Connecting to {HOST}:{PORT}")
