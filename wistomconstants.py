@@ -157,43 +157,67 @@ ERROR_CODE = {
 ## Tag parsers 
 
 TAG_PARSER = {
-    "SPEC": {
-        "CHNL": {
-            b'\x01': "channel_id_map",
-            b'\x02': "channel_id",
-            b'\x64': "switch_port", # Appears in this order in the documentation 
-            b'\x03': "activate_mask",
-            b'\x04': "nominal_frequency",
-            b'\x05': "nominal_power",
-            b'\x06': "obsolete",
-            b'\x07': "obsolete",
-            b'\x08': "frequency_hysteresis",
-            b'\x09': "obsolete",
-            b'\x0a': "obsolete",
-            b'\x0b': "obsolete",
-            b'\x0c': "osnr_warning",
-            b'\x0d': "osnr_alarm",
-            b'\x0e': "osnr_hysteresis",
-            b'\x0f': "osnr_delta_frequency",
-            b'\x10': "opm_window",
-            b'\x11': "delta_power_high_warning",
-            b'\x12': "delta_power_low_warning",
-            b'\x13': "delta_power_high_alarm",
-            b'\x14': "delta_power_low_alarm",
-            b'\x15': "power_hysteresis",
-            b'\x16': "delta_frequency_high_warning",
-            b'\x17': "delta_frequency_low_warning",
-            b'\x18': "delta_frequency_high_alarm",
-            b'\x19': "delta_frequency_low_alarm",
-            b'\x1a': "integration_interval",
-            b'\x1b': "channel_description",
+    b'SMGR': {
+        b'INFO': {
+            1: "hardware_product_number",
+            2: "hardware_id_number", 
+            3: "hardware_revision",
+            4: "hardware_serial_number",
+            17: "sensor_product_number",
+            18: "sensor_id_number",
+            19: "sensor_revision",
+            20: "sensor_serial_number",
+            33: "software_product_number",
+            35: "software_revision",
+            51: "firmware_revision",
+            52: "pld_revision",
+            53: "bootstrap_revision",
+            54: "switch_software_revision",
+            65: "unit_serial",
+            66: "production_date",
+            80: "start_calibration_frequency",
+            81: "end_calibration_frequency",
+            82: "start_calibration_temperature",
+            83: "end_calibration_temperature",
+        }
+    },
+    b'SPEC': {
+        b'CHNL': {
+            1: "channel_id_map",
+            2: "channel_id",
+            100: "switch_port", # Appears in this order in the documentation 
+            3: "activate_mask",
+            4: "nominal_frequency",
+            5: "nominal_power",
+            6: "obsolete",
+            7: "obsolete",
+            8: "frequency_hysteresis",
+            9: "obsolete",
+            10: "obsolete",
+            11: "obsolete",
+            12: "osnr_warning",
+            13: "osnr_alarm",
+            14: "osnr_hysteresis",
+            15: "osnr_delta_frequency",
+            16: "opm_window",
+            17: "delta_power_high_warning",
+            18: "delta_power_low_warning",
+            19: "delta_power_high_alarm",
+            20: "delta_power_low_alarm",
+            21: "power_hysteresis",
+            22: "delta_frequency_high_warning",
+            23: "delta_frequency_low_warning",
+            24: "delta_frequency_high_alarm",
+            25: "delta_frequency_low_alarm",
+            26: "integration_interval",
+            27: "channel_description",
         },
-        "DELC": {
-            b'\x02': "channel_id",
+        b'DELC': {
+            2: "channel_id",
         },
-        "CTBL": {
-            b'\x01': "num_channels",
-            b'\x02': "channel_table",
+        b'CTBL': {
+            1: "num_channels",
+            2: "channel_table",
         }
     }
 }
