@@ -157,8 +157,8 @@ ERROR_CODE = {
 ## Tag parsers 
 
 TAG_PARSER = {
-    b'SMGR': {
-        b'INFO': {
+    'SMGR': {
+        'INFO': {
             1: "hardware_product_number",
             2: "hardware_id_number", 
             3: "hardware_revision",
@@ -181,8 +181,8 @@ TAG_PARSER = {
             83: "end_calibration_temperature",
         }
     },
-    b'SPEC': {
-        b'CHNL': {
+    'SPEC': {
+        'CHNL': {
             1: "channel_id_map",
             2: "channel_id",
             100: "switch_port", # Appears in this order in the documentation 
@@ -212,16 +212,16 @@ TAG_PARSER = {
             26: "integration_interval",
             27: "channel_description",
         },
-        b'DELC': {
+        'DELC': {
             2: "channel_id",
         },
-        b'CTBL': {
+        'CTBL': {
             1: "num_channels",
             2: "channel_table",
         }
     },
-    b'WSNS': {
-        b'NEXT': {
+    'WSNS': {
+        'NEXT': {
             101: "port_1_peak_frequencies",
             102: "port_2_peak_frequencies",
             103: "port_3_peak_frequencies",
