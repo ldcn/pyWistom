@@ -411,15 +411,71 @@ class WistomClient:
     ###################################################################
 
     def _parse_wsns_next(self, response):
-        peak_frequency = [16]
-        peak_frequency_tag = [16]
-        peak_frequency_tag[0] = response[16]
-        number_of_peaks = struct.unpack('>I', response[17:21])[0]
-        peak_frequency[0] = struct.unpack('>d', response[17+4:25+4])[0]
+        peak_frequencies_ports = {}
+        peak_widths_ports = {}
+        peak_amplitudes_ports = {}
+        index = 16
+        while index < len(response):
+            port_tag = response[index]
+            index += 1
 
-        return {"number_of_peaks": number_of_peaks,
-                peak_frequency_tag[0]: peak_frequency[0],
+            if port_tag == 7:  # after peaks, wild undocumented tag 7 appears...
+                break
+
+            # Resolve port_tag to its string representation using TAG_PARSER
+            tag_name = TAG_PARSER.get('WSNS', {}).get('NEXT', {}).get(port_tag, f"unknown_tag_{port_tag}")
+
+            # Handle peak widths (151-166)
+            if 151 <= port_tag <= 166:
+                number_of_peak_widths = struct.unpack('>I', response[index:index + 4])[0]
+                index += 4
+                peak_widths = []
+                for _ in range(number_of_peak_widths):
+                    peak_width = struct.unpack('>d', response[index:index + 8])[0]
+                    peak_widths.append(peak_width)
+                    index += 8
+                peak_widths_ports[tag_name] = {
+                    "number_of_peaks": number_of_peak_widths,
+                    "peak_widths": peak_widths,
                 }
+                continue
+
+            # Handle peak amplitudes (201-216)
+            if 201 <= port_tag <= 216:
+                number_of_peak_amplitudes = struct.unpack('>I', response[index:index + 4])[0]
+                index += 4
+                peak_amplitudes = []
+                for _ in range(number_of_peak_amplitudes):
+                    peak_amplitude = struct.unpack('>d', response[index:index + 8])[0]
+                    peak_amplitudes.append(peak_amplitude)
+                    index += 8
+                peak_amplitudes_ports[tag_name] = {
+                    "number_of_peaks": number_of_peak_amplitudes,
+                    "peak_amplitudes": peak_amplitudes,
+                }
+                continue
+
+            # Read the number of peaks (UINT32)
+            number_of_frequency_peaks = struct.unpack('>I', response[index:index + 4])[0]
+            index += 4
+
+            # Read the peak frequencies for the port
+            peak_frequencies = []
+            for _ in range(number_of_frequency_peaks):
+                peak_frequency = struct.unpack('>d', response[index:index + 8])[0]
+                peak_frequencies.append(peak_frequency)
+                index += 8
+
+            peak_frequencies_ports[tag_name] = {
+                "number_of_peaks": number_of_frequency_peaks,
+                "peak_frequencies": peak_frequencies,
+            }
+
+        return {
+            "peak_frequencies_ports": peak_frequencies_ports,
+            "peak_widths_ports": peak_widths_ports,
+            "peak_amplitudes_ports": peak_amplitudes_ports,
+        }
 
 if __name__ == "__main__":
 
@@ -427,7 +483,8 @@ if __name__ == "__main__":
     with WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
         login_response = client.login()
         print("Login Response:", login_response)
+        client.custom_api_request(COMMAND_ID['GET'], b'WSNS', b'NEXT', b'')
 
         if login_response.get("command_id") == 'LOGINIRES':
-            network_info = client.get_network_info()
+            network_info = client.get_smgr_network_info()
             print("Network Info:", network_info)
