@@ -148,8 +148,6 @@ class WistomClient:
             "Token": f"{token}",
         } 
 
-        pass
-
     def _parse_setack_header(self, response):
         token = int.from_bytes(response[2:4], 'big')
         app_id = response[4:8].decode('ascii')
