@@ -103,7 +103,7 @@ RESPONSE_PARSER = {
         "REST": "", # SET only
         "IP##": "_parse_network_info_response",
         "FLSH": "", # SET only
-        "SER#": "_parse_smgr_serial_response", # not functional
+        "SER#": "_parse_serial_response",
         "TIME": "_parse_datetime_response",
         "INFO": "_parse_product_info_response",
         "TEMP": "_parse_system_temperature_response",
@@ -179,7 +179,14 @@ TAG_PARSER = {
             81: "end_calibration_frequency",
             82: "start_calibration_temperature",
             83: "end_calibration_temperature",
-        }
+        },
+        'SER#': {
+            1: "serial_interface",
+            2: "baud_rate",
+            3: "data_bits",
+            4: "stop_bits",
+            5: "parity_bit",
+        },
     },
     'SPEC': {
         'CHNL': {
