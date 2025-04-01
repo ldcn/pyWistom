@@ -69,6 +69,12 @@ class WistomClient:
         self.__increment_token()
         return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'IP##', b'')
     
+    def get_smgr_serial_settings(self):
+        self.__increment_token()
+        # There is only one serial interface, 0x01, but supplying the (tag number and) interface number is required.
+        # If not supplied, the request will result in a GETERR.
+        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'SER#', b'\x01\x01')
+    
     def get_smgr_time(self):
         self.__increment_token()
         return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'TIME', b'')
@@ -272,6 +278,22 @@ class WistomClient:
             "logged_in_users": logged_in_users,
             "users": parsed_data
         }
+
+    def _parse_serial_response(self, response):
+        serial_settings = {}
+        index = 16
+        while index < len(response):
+            tag = response[index]
+            index += 1
+            tag_name = TAG_PARSER.get('SMGR', {}).get('SER#', {}).get(tag, f"unknown_tag_{tag}")
+            if tag == 2:
+                serial_settings[tag_name] = struct.unpack('>I', response[index:index + 4])[0]
+                index += 4
+            else:
+                serial_settings[tag_name] = struct.unpack('B', response[index:index + 1])[0]
+                index += 1
+
+        return serial_settings
 
     def _parse_network_info_response(self, response):
         strings = response[16:].split(b'\x00')
