@@ -441,7 +441,7 @@ class WistomClient:
         peak_frequencies_ports = {}
         peak_widths_ports = {}
         peak_amplitudes_ports = {}
-        index = 16
+        index = 16 # Start after header
         while index < len(response):
             port_tag = response[index]
             index += 1
@@ -449,7 +449,7 @@ class WistomClient:
             if port_tag == 7:  # after peaks, wild undocumented tag 7 appears...
                 break
 
-            # Resolve port_tag to its string representation using TAG_PARSER
+            # Resolve port_tag to its string representation using TAG_PARSER in wistomconstants
             tag_name = TAG_PARSER.get('WSNS', {}).get('NEXT', {}).get(port_tag, f"unknown_tag_{port_tag}")
 
             # Handle peak widths (151-166)
