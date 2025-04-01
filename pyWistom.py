@@ -447,8 +447,6 @@ class WistomClient:
     ###################################################################
 
     def _parse_wsns_data(self, response):
-        # if self.__handle_response[data] == b'':
-        # print(self.__send_request[data])
         spectrum_data = {}
         index = 16
         while index < len(response):
