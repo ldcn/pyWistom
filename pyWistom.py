@@ -393,23 +393,6 @@ class WistomClient:
             "system_load": system_load,
         }
     
-    def _parse_list_snmp_trap_receivers_response(self, response):
-        strings = response[16:].split(b'\x00')
-        trap_ip_address = strings[0][1:].decode('ascii')
-        trap_port = int.from_bytes(response[-2:], 'big')
-
-        return {
-            "trap_ip_address": trap_ip_address,
-            "trap_port": trap_port,
-        }
-    
-    def _parse_snmp_config_response(self, response):
-        agent_port = int.from_bytes(response[-2:], 'big')
-
-        return {
-            "agent_port": agent_port,
-        }
-    
     def _parse_system_temperature_response(self, response):
         board_temp = struct.unpack('>f', response[17:21])[0]
         sensor_temp = struct.unpack('>f', response[22:26])[0]
@@ -429,6 +412,23 @@ class WistomClient:
             "conf_max_temp": conf_max_temp,
             # "conf_max_temp_2": conf_max_temp_2,
             "fpga_temp": fpga_temp,
+        }
+    
+    def _parse_list_snmp_trap_receivers_response(self, response):
+        strings = response[16:].split(b'\x00')
+        trap_ip_address = strings[0][1:].decode('ascii')
+        trap_port = int.from_bytes(response[-2:], 'big')
+
+        return {
+            "trap_ip_address": trap_ip_address,
+            "trap_port": trap_port,
+        }
+    
+    def _parse_snmp_config_response(self, response):
+        agent_port = int.from_bytes(response[-2:], 'big')
+
+        return {
+            "agent_port": agent_port,
         }
     
     def _parse_smgr_inst_response(self, response):
@@ -533,6 +533,12 @@ class WistomClient:
                 "number_of_peaks": number_of_frequency_peaks,
                 "peak_frequencies": peak_frequencies,
             }
+
+            ##################################################
+            ##                                              ##
+            ## Add the remaining tags (7, 3, 4, 5, 6) here! ##
+            ##                                              ##
+            ##################################################
 
         return {
             "peak_frequencies_ports": peak_frequencies_ports,
