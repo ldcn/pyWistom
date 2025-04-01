@@ -423,6 +423,20 @@ class WistomClient:
     ## For reference, see Wistom API documentation (document 100051) ##
     ###################################################################
 
+    def _parse_wsns_data(self, response):
+        spectrum_data = {}
+        index = 16
+        while index < len(response):
+            tag = response[index]
+            index += 1
+
+            tag_name = TAG_PARSER.get('WSNS', {}).get('DATA', {}).get(tag, f"unknown_tag_{tag}")
+            data = response[index]
+            spectrum_data[tag_name] = bool(data)
+            index +=1
+
+        return spectrum_data
+        
     def _parse_wsns_port(self, response):
         sensor_ports = {}
         index = 16 # start after header
