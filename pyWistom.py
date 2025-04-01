@@ -119,9 +119,9 @@ class WistomClient:
             raise ConnectionError("Not connected to server")
         self.socket.sendall(payload)
         response = self.socket.recv(4096) ## Test all possible Wistom API requests
-        return self.__handle_response(app_id, op_id, response)
+        return self.__handle_response(app_id, op_id, data, response)
     
-    def __handle_response(self, app_id, op_id, response):
+    def __handle_response(self, app_id, op_id, data, response):
         cid = response[0:2]
         header_parser_name = RESPONSE_HEADER_PARSER.get(cid, "__parse_unknown_command")
         header_parser = getattr(self, header_parser_name, self.__parse_unknown_command)
@@ -134,6 +134,7 @@ class WistomClient:
 
             return {
                 "header": parsed_header,
+                "data": [byte for byte in data],
                 "response": parsed_response,
             }
         else: return parsed_header
@@ -446,6 +447,8 @@ class WistomClient:
     ###################################################################
 
     def _parse_wsns_data(self, response):
+        # if self.__handle_response[data] == b'':
+        # print(self.__send_request[data])
         spectrum_data = {}
         index = 16
         while index < len(response):
