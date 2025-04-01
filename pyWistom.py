@@ -1,11 +1,24 @@
 import socket
 import struct
 
-from wistomconstants import *
-from wistomconfig import HOST, PORT, USER_ID, PASSWORD
+from wistomconfig import (
+    HOST, 
+    PORT, 
+    USER_ID, 
+    PASSWORD, 
+    API_VERSION
+)
 
-# Not yet implemented, for future-proofing
-from wistomconfig import API_VERSION
+from wistomconstants import (
+    COMMAND_ID,
+    ALARM_ID,
+    LOGIN_RESULT,
+    RESPONSE_HEADER_PARSER,
+    RESPONSE_PARSER,
+    ERROR_CODE,
+    TAG_PARSER,
+    PORT_TYPE,
+)
 
 class WistomClient:
     def __init__(self, host, port, user_id, password):
@@ -409,6 +422,20 @@ class WistomClient:
     ## Wistsense API function parsers                                ##
     ## For reference, see Wistom API documentation (document 100051) ##
     ###################################################################
+
+    def _parse_wsns_port(self, response):
+        sensor_ports = {}
+        index = 16 # start after header
+        while index < len(response):
+            port_tag = response[index]
+            index += 1
+
+            tag_name = TAG_PARSER.get('WSNS', {}).get('PORT', {}).get(port_tag, f"unknown_port_{port_tag}")
+            type_name = PORT_TYPE.get(response[index], f"Unknown")
+            sensor_ports[tag_name] = type_name
+            index += 1
+
+        return sensor_ports            
 
     def _parse_wsns_next(self, response):
         peak_frequencies_ports = {}
