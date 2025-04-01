@@ -278,6 +278,10 @@ TAG_PARSER = {
         'PORT': {
             **{101 + i: f"port_{i + 1}" for i in range(50)}
         },
+        'DATA': {
+            1: "next_sensor_channel",
+            2: "normalized_spectrum",
+        }
     }
 }
 
