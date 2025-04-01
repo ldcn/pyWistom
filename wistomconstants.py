@@ -274,6 +274,17 @@ TAG_PARSER = {
             4: "absolute_reference_linear_fit",
             5: "number_of_data_points",
             6: "first_and_last_crossing",
-        }
+        },
+        'PORT': {
+            **{101 + i: f"port_{i + 1}" for i in range(50)}
+        },
     }
+}
+
+PORT_TYPE = {
+    0: "Inactive",
+    1: "Sensor port",
+    2: "Gas cell reference port",
+    3: "Interferometer port",
+    4: "Interferometer port", # difference?
 }
