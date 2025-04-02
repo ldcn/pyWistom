@@ -157,6 +157,13 @@ ERROR_CODE = {
 ## Tag parsers 
 
 TAG_PARSER = {
+    'LGIN': {
+        'UINF': {
+            1: "user_name",
+            2: "user_level",
+            3: "interfaces",
+        },
+    },
     'SMGR': {
         'INFO': {
             1: "hardware_product_number",
@@ -288,6 +295,7 @@ TAG_PARSER = {
         'DATA': {
             1: "next_sensor_channel",
             2: "normalized_spectrum",
+            11: "spectrum_data"
         }
     }
 }
