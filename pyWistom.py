@@ -161,14 +161,19 @@ class WistomClient:
         if cid == (COMMAND_ID["GETRES"] or COMMAND_ID["LOGINRES"]):
             parser_name = RESPONSE_PARSER.get(app_id.decode('ascii'), {}).get(op_id.decode('ascii'), "_parse_unknown_response")
             parser = getattr(self, parser_name, self.__parse_unknown_response)
-            parsed_response = parser(response)
+            
+            # Ensure data is only passed if required by the parser
+            if request_data and callable(parser):
+                parsed_response = parser(response, request_data)
+            else:
+                parsed_response = parser(response)
 
             return {
                 "header": parsed_header,
-                "data": [byte for byte in data],
                 "response": parsed_response,
             }
-        else: return parsed_header
+        else:
+            return parsed_header
     
     def __parse_unknown_command(self, response):
         print(f"Unknown command: {response[0:2].hex()}")
@@ -183,7 +188,7 @@ class WistomClient:
             "response": self.__parse_unknown_response(response),
         }
 
-    def __parse_unknown_response(self, response):
+    def __parse_unknown_response(self, response, data=None):
         return {
             "bytes": response[16:],
             "hex": response[16:].hex(),
