@@ -347,9 +347,11 @@ class WistomClient:
             "users": parsed_data
         }
 
-    def _parse_serial_response(self, response):
+    def _parse_serial_response(self, response, data=None):
         serial_settings = {}
         index = 16
+        # If data is not provided, use an empty byte string
+        data = data or b''
         while index < len(response):
             tag = response[index]
             index += 1
