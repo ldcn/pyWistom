@@ -515,19 +515,101 @@ class WistomClient:
     ## For reference, see Wistom API documentation (document 100051) ##
     ###################################################################
 
-    def _parse_wsns_data(self, response):
+    def _parse_wsns_data(self, response, data=None):
+        print(data)
         spectrum_data = {}
         index = 16
-        while index < len(response):
-            tag = response[index]
-            index += 1
+        if data == None:
+            while index < len(response):
+                tag = response[index]
+                index += 1
 
-            tag_name = TAG_PARSER.get('WSNS', {}).get('DATA', {}).get(tag, f"unknown_tag_{tag}")
-            data = response[index]
-            spectrum_data[tag_name] = bool(data)
-            index +=1
+                tag_name = TAG_PARSER.get('WSNS', {}).get('DATA', {}).get(tag, f"unknown_tag_{tag}")
+                value = response[index]
+                spectrum_data[tag_name] = bool(value)
+                index +=1
+            return spectrum_data
+        else:
+            match data[1]:
+                case 1:
+                    spectrum_data_values = []
+                    tag = response[index]
+                    index += 1
+                    tag_name = TAG_PARSER.get('WSNS', {}).get('DATA', {}).get(tag, f"unknown_tag_{tag}")
+                    spectrum_data_length = struct.unpack('>I', response[index:index + 4])[0]
+                    index += 4
+                    for value in range(spectrum_data_length):
+                        spectrum_value = struct.unpack('>f', response[index:index + 4])[0]
+                        spectrum_data_values.append(spectrum_value)
+                        index += 4
+                    spectrum_data = {
+                        "spectrum_data_length": spectrum_data_length,
+                        "spectrum_data_values": spectrum_data_values,
+                    }
+                case 2: # Wavelength reference spectrum
+                    spectrum_data_values = []
+                    tag = response[index]
+                    index += 1
+                    tag_name = TAG_PARSER.get('WSNS', {}).get('DATA', {}).get(tag, f"unknown_tag_{tag}")
+                    spectrum_data_length = struct.unpack('>I', response[index:index + 4])[0]
+                    index += 4
+                    for value in range(spectrum_data_length):
+                        spectrum_value = struct.unpack('>f', response[index:index + 4])[0]
+                        spectrum_data_values.append(spectrum_value)
+                        index += 4
+                    spectrum_data = {
+                        "spectrum_data_length": spectrum_data_length,
+                        "spectrum_data_values": spectrum_data_values,
+                    }
+                case 3: # Interferometer spectrum
+                    spectrum_data_values = []
+                    tag = response[index]
+                    index += 1
+                    tag_name = TAG_PARSER.get('WSNS', {}).get('DATA', {}).get(tag, f"unknown_tag_{tag}")
+                    spectrum_data_length = struct.unpack('>I', response[index:index + 4])[0]
+                    index += 4
+                    for value in range(spectrum_data_length):
+                        spectrum_value = struct.unpack('>f', response[index:index + 4])[0]
+                        spectrum_data_values.append(spectrum_value)
+                        index += 4
+                    spectrum_data = {
+                        "spectrum_data_length": spectrum_data_length,
+                        "spectrum_data_values": spectrum_data_values,
+                    }
+                case 4: # White light spectrum
+                    spectrum_data_values = []
+                    tag = response[index]
+                    index += 1
+                    tag_name = TAG_PARSER.get('WSNS', {}).get('DATA', {}).get(tag, f"unknown_tag_{tag}")
+                    spectrum_data_length = struct.unpack('>I', response[index:index + 4])[0]
+                    index += 4
+                    for value in range(spectrum_data_length):
+                        spectrum_value = struct.unpack('>f', response[index:index + 4])[0]
+                        spectrum_data_values.append(spectrum_value)
+                        index += 4
+                    spectrum_data = {
+                        "spectrum_data_length": spectrum_data_length,
+                        "spectrum_data_values": spectrum_data_values,
+                    }
+                case 5: # Frequency scale
+                    spectrum_data_values = []
+                    tag = response[index]
+                    index += 1
+                    tag_name = TAG_PARSER.get('WSNS', {}).get('DATA', {}).get(tag, f"unknown_tag_{tag}")
+                    spectrum_data_length = struct.unpack('>I', response[index:index + 4])[0]
+                    index += 4
+                    for value in range(spectrum_data_length):
+                        spectrum_value = struct.unpack('>f', response[index:index + 4])[0]
+                        spectrum_data_values.append(spectrum_value)
+                        index += 4
+                    spectrum_data = {
+                        "spectrum_data_length": spectrum_data_length,
+                        "spectrum_data_values": spectrum_data_values,
+                    }
+            return spectrum_data   
 
-        return spectrum_data
+                        
+                        
         
     def _parse_wsns_port(self, response):
         sensor_ports = {}
