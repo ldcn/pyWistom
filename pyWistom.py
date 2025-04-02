@@ -246,10 +246,13 @@ class WistomClient:
         token = int.from_bytes(response[2:4], 'big')
         app_id = response[4:8].decode('ascii')
         op_id = response[8:12].decode('ascii')
-
+        data_length = int.from_bytes(response[12:16], 'big')
+        data_length_measured = (len(response[16:]))
         return {
             "GET Response": f"{app_id} {op_id}",
-            "Token": f"{token}"
+            "Token": f"{token}",
+            "data_length": f"{data_length}",
+            "data_length_measured": f"{data_length_measured}"
         }
           
     def __increment_token(self):
