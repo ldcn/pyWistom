@@ -41,6 +41,7 @@ class WistomClient:
     ## Context manager methods
     def __enter__(self):
         self.connect()
+        self.login()
         return self
     
     def __exit__(self, type, value, traceback):
@@ -607,9 +608,7 @@ class WistomClient:
                         "spectrum_data_values": spectrum_data_values,
                     }
             return spectrum_data   
-
-                        
-                        
+         
         
     def _parse_wsns_port(self, response):
         sensor_ports = {}
