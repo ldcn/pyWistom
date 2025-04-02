@@ -276,7 +276,35 @@ class WistomClient:
     ## For reference, see Wistom API documentation (document 100051) ##
     ###################################################################
 
-    def _parse_login_session_info_response(self, response):
+    def _parse_login_user_info_response(self, response, data=None):
+        user_info = {}
+        index = 16
+        payload = response[index:]
+        
+        while index < len(payload):
+            tag = payload[index]
+            index += 1
+            tag_name = TAG_PARSER.get('LGIN', {}).get('UINF', {}).get(tag, f"unknown_tag_{tag}")
+
+            # Find the null byte and slice the string directly
+            null_terminated_string_end = payload.find(b'\x00', index)
+            if null_terminated_string_end == -1:
+                break
+            user_name = payload[:null_terminated_string_end].decode('ascii')
+
+
+            user_info[tag_name] = user_name
+            index += (null_terminated_string_end - index + 1)
+            tag = payload[index]
+            tag_name = TAG_PARSER.get('LGIN', {}).get('UINF', {}).get(tag, f"unknown_tag_{tag}")
+            user_level = struct.unpack('>I', payload[index:index + 4])[0]
+            user_info[tag_name] = user_level
+            print(user_info)
+
+        return user_info
+            
+
+    def _parse_login_session_info_response(self, response, data=None):
         
         index = 0
         logged_in_users = 0
