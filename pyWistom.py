@@ -107,21 +107,52 @@ class WistomClient:
     ## Private methods
 
     ## Helper methods
-    def __send_request(self, cid, app_id, op_id, data):
-        data_length = len(data)
+    def __send_request(self, cid, app_id, op_id, request_data):
+        data_length = len(request_data)
         payload = (cid 
                    + self.token.to_bytes(2, 'big')
                    + app_id
                    + op_id
                    + data_length.to_bytes(4, 'big')
-                   + data)
+                   + request_data)
         if not self.socket:
             raise ConnectionError("Not connected to server")
-        self.socket.sendall(payload)
-        response = self.socket.recv(4096) ## Test all possible Wistom API requests
-        return self.__handle_response(app_id, op_id, data, response)
+        
+        # Set a timeout for the socket
+        self.socket.settimeout(5.0) 
+        
+        try:
+            self.socket.sendall(payload)
+            # Receive the full response in smaller chunks
+            response = self.__receive_full_response()
+        except socket.timeout:
+            raise TimeoutError("Request timed out after 5 seconds")
+        finally:
+            # Reset the timeout to None (blocking mode) after the request
+            self.socket.settimeout(None)
+        
+        return self.__handle_response(app_id, op_id, response, request_data)
+
+    def __receive_full_response(self):
+        # Read the header first to determine the total payload size
+        header = self.socket.recv(16)
+        if len(header) < 16:
+            raise ConnectionError("Incomplete response header received")
+
+        data_length = int.from_bytes(header[12:16], 'big')
+        total_length = 16 + data_length
+
+        # Receive the remaining payload in chunks
+        response = header
+        while len(response) < total_length:
+            chunk = self.socket.recv(min(4096, total_length - len(response)))
+            if not chunk:
+                raise ConnectionError("Connection closed before full payload was received")
+            response += chunk
+
+        return response
     
-    def __handle_response(self, app_id, op_id, data, response):
+    def __handle_response(self, app_id, op_id, response, request_data=None):
         cid = response[0:2]
         header_parser_name = RESPONSE_HEADER_PARSER.get(cid, "__parse_unknown_command")
         header_parser = getattr(self, header_parser_name, self.__parse_unknown_command)
