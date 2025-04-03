@@ -532,7 +532,7 @@ class WistomClient:
             return spectrum_data
         else:
             match data[1]:
-                case 1:
+                case 1: # Sensor spectrum
                     spectrum_data_values = []
                     tag = response[index]
                     index += 1
@@ -629,11 +629,16 @@ class WistomClient:
         peak_widths_ports = {}
         peak_amplitudes_ports = {}
         index = 16 # Start after header
+
+        # Tag 101-116 (Frequency of each peak in spectrum, one spectrum per port)
+        # Tag 151-166 (FWHM of each peak)
+        # Tag 201-216 (Amplitudes of each peak)
+        # First value after each tag is the number of peaks.
+
         while index < len(response):
             port_tag = response[index]
 
-
-            if port_tag == 7:  # after peaks, wild undocumented tag 7 appears...
+            if port_tag == 7: # Tag 7, 3, 4, 5, 6 comes after peak data in this order and is parsed differently
                 break
             index += 1
 
@@ -687,6 +692,10 @@ class WistomClient:
             }
 
 
+        calibration_data = {}
+        
+        # Tag 7, 3, 4, 5, 6 are used for calibration and error correction (?)
+
         # Tag 7: Frequency errors
         while index < len(response):
             tag = response[index]
@@ -704,9 +713,9 @@ class WistomClient:
                 index += 8
 
         
-        fitting_calib_data = {}
-        # Tag 3-6 (linear fits and other data for calibration and error-correcting)
-
+        
+        # Tag 3-6 (linear fit equation and other data for calibration and error-correcting)
+        
         # Tag 3 & 4 (linear fits)
         while index < len(response):
             tag = response[index]
@@ -714,8 +723,8 @@ class WistomClient:
                 break
             index += 1
             tag_name = TAG_PARSER.get('WSNS', {}).get('NEXT', {}).get(tag, f"unknown_tag_{tag}")
-            fitting_calib_data[tag_name] = None 
-            fitting_calib_data[tag_name] = {
+            calibration_data[tag_name] = None 
+            calibration_data[tag_name] = {
                 'slope': struct.unpack('>d', response[index:index + 8])[0],
                 'intercept': struct.unpack('>d', response[index + 8:index + 16])[0],
                 'r_value': struct.unpack('>d', response[index + 16:index + 24])[0]
@@ -726,22 +735,28 @@ class WistomClient:
         tag = response[index]
         index +=1
         tag_name = TAG_PARSER.get('WSNS', {}).get('NEXT', {}).get(tag, f"unknown_tag_{tag}")
-        data_points = {
+        calibration_data[tag_name] = {
             'reference_lines': struct.unpack('>I', response[index:index + 4])[0],
             'zero_crossings': struct.unpack('>I', response[index + 4: index + 8])[0]
         }
         index += 8
         
-        ## tag 6 left
+        # tag 6 first and last crossing
+
+        tag = response[index]
+        index +=1
+        tag_name = TAG_PARSER.get('WSNS', {}).get('NEXT', {}).get(tag, f"unknown_tag_{tag}")
+        calibration_data[tag_name] = {
+            'first': struct.unpack('>d', response[index:index + 8])[0],
+            'last': struct.unpack('>d', response[index + 8:index + 16])[0]
+        }
+        index += 16
 
         return {
             "peak_frequencies_ports": peak_frequencies_ports,
             "peak_widths_ports": peak_widths_ports,
             "peak_amplitudes_ports": peak_amplitudes_ports,
-            "interferometer_linear_fit": fitting_calib_data['interferometer_linear_fit'],
-            "absolute_reference_linear_fit": fitting_calib_data['absolute_reference_linear_fit'],
-            "number_of_data_points": data_points,
-            "frequency_errors": frequency_errors,
+            "calibration_data": calibration_data,
         }
 
 if __name__ == "__main__":
