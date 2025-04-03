@@ -631,10 +631,11 @@ class WistomClient:
         index = 16 # Start after header
         while index < len(response):
             port_tag = response[index]
-            index += 1
+
 
             if port_tag == 7:  # after peaks, wild undocumented tag 7 appears...
                 break
+            index += 1
 
             # Resolve port_tag to its string representation using TAG_PARSER in wistomconstants
             tag_name = TAG_PARSER.get('WSNS', {}).get('NEXT', {}).get(port_tag, f"unknown_tag_{port_tag}")
@@ -685,16 +686,62 @@ class WistomClient:
                 "peak_frequencies": peak_frequencies,
             }
 
-            ##################################################
-            ##                                              ##
-            ## Add the remaining tags (7, 3, 4, 5, 6) here! ##
-            ##                                              ##
-            ##################################################
+
+        # Tag 7: Frequency errors
+        while index < len(response):
+            tag = response[index]
+            if tag == 3:
+                break
+            index += 1
+            tag_name = TAG_PARSER.get('WSNS', {}).get('NEXT', {}).get(tag, f"unknown_tag_{tag}")
+            number_of_frequency_errors = struct.unpack('>I', response[index:index + 4])[0]
+            index += 4
+
+            frequency_errors = []
+            for _ in range(number_of_frequency_errors):
+                frequency_error = struct.unpack('>d', response[index:index + 8])[0]
+                frequency_errors.append(frequency_error)
+                index += 8
+
+        
+        fitting_calib_data = {}
+        # Tag 3-6 (linear fits and other data for calibration and error-correcting)
+
+        # Tag 3 & 4 (linear fits)
+        while index < len(response):
+            tag = response[index]
+            if tag == 5:
+                break
+            index += 1
+            tag_name = TAG_PARSER.get('WSNS', {}).get('NEXT', {}).get(tag, f"unknown_tag_{tag}")
+            fitting_calib_data[tag_name] = None 
+            fitting_calib_data[tag_name] = {
+                'slope': struct.unpack('>d', response[index:index + 8])[0],
+                'intercept': struct.unpack('>d', response[index + 8:index + 16])[0],
+                'r_value': struct.unpack('>d', response[index + 16:index + 24])[0]
+                }
+            index += 24
+
+        # Tag 5 (number of reference lines & zero-crossings)
+        tag = response[index]
+        index +=1
+        tag_name = TAG_PARSER.get('WSNS', {}).get('NEXT', {}).get(tag, f"unknown_tag_{tag}")
+        data_points = {
+            'reference_lines': struct.unpack('>I', response[index:index + 4])[0],
+            'zero_crossings': struct.unpack('>I', response[index + 4: index + 8])[0]
+        }
+        index += 8
+        
+        ## tag 6 left
 
         return {
             "peak_frequencies_ports": peak_frequencies_ports,
             "peak_widths_ports": peak_widths_ports,
             "peak_amplitudes_ports": peak_amplitudes_ports,
+            "interferometer_linear_fit": fitting_calib_data['interferometer_linear_fit'],
+            "absolute_reference_linear_fit": fitting_calib_data['absolute_reference_linear_fit'],
+            "number_of_data_points": data_points,
+            "frequency_errors": frequency_errors,
         }
 
 if __name__ == "__main__":
