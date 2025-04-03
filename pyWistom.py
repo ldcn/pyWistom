@@ -404,54 +404,26 @@ class WistomClient:
         }
     
     def _parse_product_info_response(self, response):
+        product_info = {}
         strings = response[16:].split(b'\x00', 16)[:-1]
-        # Skipping tag bytes (might need to change this later)
-        hardware_product_number = strings[0][1:].decode('ascii')
-        hardware_id_number = strings[1][1:].decode('ascii')
-        hardware_revision = strings[2][1:].decode('ascii')
-        hardware_serial_number = strings[3][1:].decode('ascii')
-        sensor_product_number = strings[4][1:].decode('ascii')
-        sensor_id_number = strings[5][1:].decode('ascii')
-        sensor_revision = strings[6][1:].decode('ascii')
-        sensor_serial_number = strings[7][1:].decode('ascii')
-        software_product_number = strings[8][1:].decode('ascii')
-        software_revision = strings[9][1:].decode('ascii')
-        firmware_revision = strings[10][1:].decode('ascii')
-        pld_revision = strings[11][1:].decode('ascii')
-        bootstrap_revision = strings[12][1:].decode('ascii')
-        switch_software_revision = strings[13][1:].decode('ascii')
-        unit_serial = strings[14][1:].decode('ascii')
-        production_date = strings[15][1:].decode('ascii')
+        for string in range(len(strings)):
+            tag = strings[string][0]
+            tag_name = TAG_PARSER.get('SMGR', {}).get('INFO', {}).get(tag, f"unknown_tag_{tag}")
+            product_info[tag_name] = strings[string][1:].decode('ascii')
 
-        start_index = sum((len(s) + 2) for s in strings[:16])  # +1 for each null character and +1 for each tag
-
-        start_calibration_frequency = struct.unpack('>d', response[start_index + 1:start_index + 9])[0]
-        end_calibration_frequency = struct.unpack('>d', response[start_index + 10:start_index + 18])[0]
-        start_calibration_temperature = struct.unpack('>f', response[start_index + 19:start_index + 23])[0]
-        end_calibration_temperature = struct.unpack('>f', response[start_index + 24:start_index + 28])[0]
-
-        return {
-            "hardware_product_number": hardware_product_number,
-            "hardware_id_number": hardware_id_number,
-            "hardware_revision": hardware_revision,
-            "hardware_serial_number": hardware_serial_number,
-            "sensor_product_number": sensor_product_number,
-            "sensor_id_number": sensor_id_number,
-            "sensor_revision": sensor_revision,
-            "sensor_serial_number": sensor_serial_number,
-            "software_product_number": software_product_number,
-            "software_revision": software_revision,
-            "firmware_revision": firmware_revision,
-            "pld_revision": pld_revision,
-            "bootstrap_revision": bootstrap_revision,
-            "switch_software_revision": switch_software_revision,
-            "unit_serial": unit_serial,
-            "production_date": production_date,
-            "start_calibration_frequency": start_calibration_frequency,
-            "end_calibration_frequency": end_calibration_frequency,
-            "start_calibration_temperature": start_calibration_temperature,
-            "end_calibration_temperature": end_calibration_temperature,
-        }
+        index = sum((len(s) + 2) for s in strings[:16])  # +1 for each null character and +1 for each tag
+        while index < len(response):
+            tag = response[index]
+            index += 1
+            tag_name = TAG_PARSER.get('SMGR', {}).get('INFO', {}).get(tag, f"unknown_tag_{tag}")
+            if tag < 82:
+                product_info[tag_name] = struct.unpack('>d', response[index:index + 8])[0]
+                index += 8
+            else:
+                product_info[tag_name] = struct.unpack('>f', response[index:index + 4])[0]
+                index += 4        
+    
+        return product_info
     
     def _parse_system_uptime_response(self, response):
         uptime = struct.unpack('>f', response[17:21])[0]
@@ -510,23 +482,6 @@ class WistomClient:
             "snmp_installed": snmp_installed,
             "obsolete_installed": obsolete_installed,
         }
-    
-    ###################################################################
-    ## Pulse frequency control API function parsers                  ##
-    ## For reference, see Wistom API documentation (document 100051) ##
-    ###################################################################
-
-    def _parse_frequency_regulator_values(self, response):
-        index = 16
-        frequency_regulator_values = {}
-        while index < len(response):
-            tag = response[index]
-            index +=1
-            tag_name = TAG_PARSER.get('PULF', {}).get('REGV', {}).get(tag, f"unknown_tag_{tag}")
-            frequency_regulator_values[tag_name] = struct.unpack('>d', response[index:index + 8])[0]
-            index += 8
-
-        return frequency_regulator_values
 
     ###################################################################
     ## Wistsense API function parsers                                ##
