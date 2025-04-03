@@ -99,6 +99,17 @@ RESPONSE_PARSER = {
         "SWHA": "_parse_opm_switch_handling_response",
     },
 
+    "PULF": { # Pulse frequency control
+        "COMP": "_parse_compensation_toggle",
+        "PULS": "_parse_pulse_resonance_spectrum",
+        "REGZ": "_parse_frequency_z_regulator",
+        "REGV": "_parse_frequency_regulator_values",
+        "REGC": "_parse_frequency_regulator_control",
+        "RESC": "_parse_pulse_resonance_configuration",
+        "RTEC": "_parse_repeat_time_event_control",
+        "REGP": "_parse_frequency_pid_regulator",
+    },
+
     "SMGR": { # System Manager operations
         "REST": "", # SET only
         "IP##": "_parse_network_info_response",
@@ -160,8 +171,24 @@ TAG_PARSER = {
     'LGIN': {
         'UINF': {
             1: "user_name",
-            2: "user_level",
-            3: "interfaces",
+            2: "password", # hidden, added for completeness
+            3: "user_level",
+            4: "interfaces",
+        },
+    },
+    'PULF': {
+        'REGV': {
+            1: "regulator_input",
+            2: "regulator_output",
+            3: "q_max_level",
+            4: "q_ptop",
+            5: "q_slope",
+            6: "current_frequency",
+            7: "last_frequency", 
+            8: "q_square_sum",
+            9: "best_resonance_frequency",
+            10: "temperature_frequency",
+            11: "sensor_mean",
         },
     },
     'SMGR': {
