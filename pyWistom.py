@@ -758,6 +758,52 @@ class WistomClient:
             "peak_amplitudes_ports": peak_amplitudes_ports,
             "calibration_data": calibration_data,
         }
+    
+    # There are bugs in the code and mistakes in the documentation for WSNS PARA.
+    # Update this parser function after issues are solved.
+    def _parse_wsns_para(self, response):
+        wistsense_parameters = {}
+        # Tag 1 (UINT32)
+        index = 16
+        while index < len(response):
+            tag = response[index]
+            if tag == 2:
+                break
+            index += 1
+            tag_name = TAG_PARSER.get('WSNS', {}).get('PARA', {}).get(tag, f"unknown_tag_{tag}")
+            wistsense_parameters[tag_name] = struct.unpack('>B', response[index:index + 1])[0]
+            index += 1
+        # Tags 2-6 (FLOAT64 values)
+        while index < len(response):
+            tag = response[index]
+            if tag == 7:
+                break
+            index += 1
+            tag_name = TAG_PARSER.get('WSNS', {}).get('PARA', {}).get(tag, f"unknown_tag_{tag}")
+            wistsense_parameters[tag_name] = struct.unpack('>d', response[index:index + 8])[0]
+            index += 8
+
+        # Tags 7-8 (UINT32)
+        while index < len(response):
+            tag = response[index]
+            if tag == 101:
+                break
+            index += 1
+            tag_name = TAG_PARSER.get('WSNS', {}).get('PARA', {}).get(tag, f"unknown_tag_{tag}")
+            wistsense_parameters[tag_name] = struct.unpack('>I', response[index:index + 4])[0]
+            index += 4
+
+        #Tag 101-150 (sensor port thresholds, FLOAT64)
+        while index < len(response):
+            tag = response[index]
+            if tag == 9:
+                break
+            index += 1
+            tag_name = TAG_PARSER.get('WSNS', {}).get('PARA', {}).get(tag, f"unknown_tag_{tag}")
+            wistsense_parameters[tag_name] = struct.unpack('>d', response[index:index + 8])[0]
+            index +=8
+        
+        return wistsense_parameters
 
 if __name__ == "__main__":
 

@@ -297,7 +297,21 @@ TAG_PARSER = {
             1: "next_sensor_channel",
             2: "normalized_spectrum",
             11: "spectrum_data"
-        }
+        },
+        'PARA': { # According to documentation. May be incorrect.
+            1: "peak_height_sensor_peaks",
+            2: "peak_height_reference_lines",
+            3: "frequency_delta",
+            4: "filter_constant",
+            5: "white_light_minimum",
+            6: "interferometer_start_amplitude",
+            7: "interferometer_minimum_step",
+            8: "reference_averages",
+            9: "interferometer_dispersion_compensation",
+            10: "third_order_interferometer_disperson_compensation",
+            11: "peak_interpolation_second_order_fit",
+            **{101 + i: f"port_{i + 1}_threshold" for i in range(50)},
+        },
     }
 }
 
