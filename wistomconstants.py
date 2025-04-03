@@ -288,6 +288,7 @@ TAG_PARSER = {
             4: "absolute_reference_linear_fit",
             5: "number_of_data_points",
             6: "first_and_last_crossing",
+            7: "frequency_errors",
         },
         'PORT': {
             **{101 + i: f"port_{i + 1}" for i in range(50)}
