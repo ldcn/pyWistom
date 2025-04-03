@@ -6,7 +6,7 @@
 - [ ] Add support for SMGR commands.
 - [ ] Create a CLI similar to the wistsh MMI
 - [ ] Add logging
-- [ ] Fix handling of "unknown" responses
+- [X] Fix handling of "unknown" responses
 
 ## Security
 - [ ] Mask password entry
