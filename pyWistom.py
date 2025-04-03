@@ -482,6 +482,22 @@ class WistomClient:
             "snmp_installed": snmp_installed,
             "obsolete_installed": obsolete_installed,
         }
+    
+    ###################################################################
+    ## Pulse frequency control API function parsers                  ##
+    ## For reference, see Wistom API documentation (document 100051) ##
+    ###################################################################
+    
+    def _parse_frequency_regulator_values(self, response):
+        index = 16
+        frequency_regulator_values = {}
+        while index < len(response):
+            tag = response[index]
+            index +=1
+            tag_name = TAG_PARSER.get('PULF', {}).get('REGV', {}).get(tag, f"unknown_tag_{tag}")
+            frequency_regulator_values[tag_name] = struct.unpack('>d', response[index:index + 8])[0]
+            index += 8
+        return frequency_regulator_values
 
     ###################################################################
     ## Wistsense API function parsers                                ##
