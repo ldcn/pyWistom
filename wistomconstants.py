@@ -299,7 +299,7 @@ TAG_PARSER = {
             11: "spectrum_data"
         },
         'PARA': { # According to documentation. May be incorrect.
-            1: "peak_height_sensor_peaks",
+            1: "lut_enabled",
             2: "peak_height_reference_lines",
             3: "frequency_delta",
             4: "filter_constant",
