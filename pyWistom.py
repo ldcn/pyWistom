@@ -25,31 +25,33 @@ from wistomconnection import WistomConnection
 class WistomClient:
     def __init__(self, host, port, user_id, password):
         self.connection = WistomConnection(host, port)
+
         self.user_id = user_id
         self.password = password
-        self.token = 0
 
-    ## Context manager methods
     def __enter__(self):
         self.connection.connect()
         self.login()
         return self
-    
+
     def __exit__(self, type, value, traceback):
         self.connection.disconnect()
 
-    ## Login method
-    ## Creates the login payload as described in Page 74 Table 11-2
-    ## of the Wistom User Guide
     def login(self):
-        cid = COMMAND_ID['LOGIN']
-        app_id = b'LGIN'
-        op_id = API_VERSION.encode('ascii')
-        user_id_bytes = self.user_id.encode('ascii')
-        password_bytes = self.password.encode('ascii')
-        data = (user_id_bytes + b'\x00' 
-                   + password_bytes + b'\x00')
-        return self.__send_request(cid, app_id, op_id, data)
+        response = self.connection.login(
+            self.user_id,
+            self.password,
+            COMMAND_ID['LOGIN'],
+            b'LGIN',
+            API_VERSION.encode('ascii')
+        )
+        return response
+    
+    def __increment_token(self):
+        return self.connection.increment_token()
+
+    def __get_token(self):
+        return self.connection.get_token()
     
     # API Commands
 
@@ -102,7 +104,7 @@ class WistomClient:
     def __send_request(self, cid, app_id, op_id, request_data):
         data_length = len(request_data)
         payload = (cid 
-                   + self.token.to_bytes(2, 'big')
+                   + self.connection.token.to_bytes(2, 'big')
                    + app_id
                    + op_id
                    + data_length.to_bytes(4, 'big')
@@ -246,10 +248,6 @@ class WistomClient:
             "data_length": f"{data_length}",
             "data_length_measured": f"{data_length_measured}"
         }
-          
-    def __increment_token(self):
-        self.token += 1
-        return self.token
     
     ## Parses the login response into a human-readable format
     def _parse_apiv2_login_response(self, response):        
