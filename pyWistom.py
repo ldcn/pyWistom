@@ -20,32 +20,23 @@ from wistomconstants import (
     PORT_TYPE,
 )
 
+from wistomconnection import WistomConnection
+
 class WistomClient:
     def __init__(self, host, port, user_id, password):
-        self.host = host
-        self.port = port
+        self.connection = WistomConnection(host, port)
         self.user_id = user_id
         self.password = password
-        self.socket = None
         self.token = 0
-
-    def connect(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((self.host, self.port))
-
-    def disconnect(self):
-        if self.socket:
-            self.socket.close()
-            self.socket = None
 
     ## Context manager methods
     def __enter__(self):
-        self.connect()
+        self.connection.connect()
         self.login()
         return self
     
     def __exit__(self, type, value, traceback):
-        self.disconnect()
+        self.connection.disconnect()
 
     ## Login method
     ## Creates the login payload as described in Page 74 Table 11-2
@@ -116,27 +107,27 @@ class WistomClient:
                    + op_id
                    + data_length.to_bytes(4, 'big')
                    + request_data)
-        if not self.socket:
+        if not self.connection.socket:
             raise ConnectionError("Not connected to server")
         
         # Set a timeout for the socket
-        self.socket.settimeout(5.0) 
+        self.connection.socket.settimeout(5.0) 
         
         try:
-            self.socket.sendall(payload)
+            self.connection.socket.sendall(payload)
             # Receive the full response in smaller chunks
             response = self.__receive_full_response()
         except socket.timeout:
             raise TimeoutError("Request timed out after 5 seconds")
         finally:
             # Reset the timeout to None (blocking mode) after the request
-            self.socket.settimeout(None)
+            self.connection.socket.settimeout(None)
         
         return self.__handle_response(app_id, op_id, response, request_data)
 
     def __receive_full_response(self):
         # Read the header first to determine the total payload size
-        header = self.socket.recv(16)
+        header = self.connection.socket.recv(16)
         if len(header) < 16:
             raise ConnectionError("Incomplete response header received")
 
@@ -146,7 +137,7 @@ class WistomClient:
         # Receive the remaining payload in chunks
         response = header
         while len(response) < total_length:
-            chunk = self.socket.recv(min(4096, total_length - len(response)))
+            chunk = self.connection.socket.recv(min(4096, total_length - len(response)))
             if not chunk:
                 raise ConnectionError("Connection closed before full payload was received")
             response += chunk
@@ -289,7 +280,7 @@ class WistomClient:
 
             # Find the null byte and slice the string directly
             null_terminated_string_end = payload.find(b'\x00', index)
-            if null_terminated_string_end == -1:
+            if (null_terminated_string_end == -1):
                 break
             user_name = payload[:null_terminated_string_end].decode('ascii')
 
