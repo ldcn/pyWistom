@@ -84,11 +84,16 @@ RESPONSE_PARSER = {
         "AVRG": "_parse_opm_averages_response",
         "ENAB": "_parse_opm_enable_response",
         "CALC": "_parse_opm_power_calc_response",
+        "CNFG": "_parse_opm_config_response", # incorrect description in 100051
         "OSNR": "_parse_opm_osnr_config_response",
         "CHCO": "_parse_opm_channel_config_response",
         "FRQO": "_parse_opm_frequency_option_response",
+        "OUTP": "_parse_opm_output_spectrum_response",
+        "RAWD": "_parse_opm_raw_data_response",
+        "TSPC": "_parse_opm_time_spectrum_response",
         "FSPC": "_parse_opm_frequency_spectrum_response",
         "WSPC": "_parse_opm_wavelength_spectrum_response",
+        "CSPC": "_parse_opm_compact_spectrum_response",
         "CHNL": "_parse_opm_channel_status_response",
         "CHAL": "_parse_opm_all_channels_status_response",
         "TRSH": "_parse_opm_threshold_response",
@@ -221,6 +226,62 @@ TAG_PARSER = {
             4: "stop_bits",
             5: "parity_bit",
         },
+    },
+    'OCM#': {
+        'WINS': {
+            1: "ocm_evaluation_window_size",
+        },
+        'AVRG': {
+            1: "ocm_averages",
+        },
+        'ENAB': {
+            1: "ocm_enabled",
+        },
+    },
+    'OPM#': {
+        'AVRG': {
+            1: "averages",
+        },
+        'ENAB': {
+            1: "toggle_enable",
+        },
+        "CALC": {
+            1: "toggle_power_calc",
+        },
+        "CNFG": {
+            1: "envelope_average_samples", #U8
+            2: "bias_moving_average", #U16
+            3: "spectrum_moving_average", #U16
+            4: "side_attenuation", #U8
+        },
+        "OSNR": {
+            1: "osnr_variant",
+            2: "measured_bandwidth",
+            3: "reference_bandwidth",
+            4: "max_distance_osnr_noise_measurement",
+            5: "low_limit_noise_estimation",
+            6: "noise_level_samples",
+        },
+        "CHCO": {},
+        "FRQO": {},
+        "OUTP": {},
+        "RAWD": {},
+        "ISPC": {},
+        "FSPC": {},
+        "WSPC": {},
+        "CSPC": {},
+        "CHNL": {},
+        "CHAL": {},
+        "CALD": {},
+        "CALA": {},
+        "TRSH": {},
+        "MINL": {},
+        "PCRI": {},
+        "TPWR": {},
+        "FILW": {},
+        "SFBW": {},
+        "SWHA": {},
+
     },
     'SPEC': {
         'CHNL': {
