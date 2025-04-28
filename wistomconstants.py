@@ -226,6 +226,14 @@ TAG_PARSER = {
             4: "stop_bits",
             5: "parity_bit",
         },
+        'IP##': {
+            1: "ip_address",
+            2: "subnet_mask",
+            3: "gateway_address",
+            4: "host_name",
+            5: "mac_address",
+            6: "listening_port",
+        },
     },
     'OCM#': {
         'WINS': {
