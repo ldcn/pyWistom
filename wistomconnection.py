@@ -1,4 +1,5 @@
 import socket
+import ssl
 
 class WistomConnection:
     def __init__(self, host, port):
@@ -7,9 +8,11 @@ class WistomConnection:
         self.socket = None
         self.token = 0
 
-    def connect(self):
+    def connect(self, use_tls=False):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.host, self.port))
+        if use_tls:
+            self.socket = ssl.wrap_socket(self.socket)
 
     def disconnect(self):
         if self.socket:
