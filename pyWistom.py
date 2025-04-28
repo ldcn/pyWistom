@@ -21,6 +21,7 @@ from wistomconstants import (
 )
 
 from wistomconnection import WistomConnection
+import ssl
 
 class WistomClient:
     def __init__(self, host, port, user_id, password):
@@ -356,23 +357,28 @@ class WistomClient:
         return serial_settings
 
     def _parse_network_info_response(self, response):
-        strings = response[16:].split(b'\x00')
-        # Skipping tag bytes...
-        ip_address = strings[0][1:].decode('ascii')
-        subnet_mask = strings[1][1:].decode('ascii')
-        gateway_address = strings[2][1:].decode('ascii')
-        host_name = strings[3][1:].decode('ascii')
-        mac_address = strings[4][1:].decode('ascii')
-        listening_port = int.from_bytes(strings[5][1:], 'big')
+        network_info = {}
+        index = 16
 
-        return {
-            "ip_address": ip_address,
-            "subnet_mask": subnet_mask,
-            "gateway_address": gateway_address,
-            "host_name": host_name,
-            "mac_address": mac_address,
-            "listening_port": listening_port,
-        }
+        while index < len(response):
+            tag = response[index]
+            if tag == 6:
+                break
+            else:
+                index += 1
+                tag_name = TAG_PARSER.get('SMGR', {}).get('IP##', {}).get(tag, f"unknown_tag_{tag}")
+                null_terminated_string_end = response.find(b'\x00', index)
+                if null_terminated_string_end == -1:
+                    break
+                network_info[tag_name] = response[index:null_terminated_string_end].decode('ascii')
+                index = null_terminated_string_end + 1
+
+        tag = response[index]
+        index += 1
+        tag_name = TAG_PARSER.get('SMGR', {}).get('IP##', {}).get(tag, f"unknown_tag_{tag}")
+        network_info[tag_name] = struct.unpack('>H', response[index:index + 2])[0]
+
+        return network_info
     
     def _parse_datetime_response(self, response):
         
@@ -786,10 +792,16 @@ if __name__ == "__main__":
 
     print(f"Connecting to {HOST}:{PORT}")
     with WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
+        # Wrap the socket in TLS
+        client.connection.socket = ssl.wrap_socket(
+            client.connection.socket,
+            ssl_version=ssl.PROTOCOL_TLS_CLIENT
+        )
+        
         login_response = client.login()
         print("Login Response:", login_response)
         client.custom_api_request(COMMAND_ID['GET'], b'WSNS', b'NEXT', b'')
 
         if login_response.get("command_id") == 'LOGINIRES':
-            network_info = client.get_smgr_network_info()
-            print("Network Info:", network_info)
+            network_info_resp = client.get_smgr_network_info()
+            print("Network Info:", network_info_resp)
