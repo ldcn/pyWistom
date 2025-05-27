@@ -23,6 +23,8 @@ from wistomconstants import (
 from wistomconnection import WistomConnection
 import ssl
 
+MAX_TAGS = 255
+
 class WistomClient:
     def __init__(self, host, port, user_id, password):
         self.connection = WistomConnection(host, port)
@@ -381,22 +383,20 @@ class WistomClient:
         return network_info
     
     def _parse_datetime_response(self, response):
+        date_time = {}
+        index = 16
+        while index < len(response):
+            tag = response[index]
+            index += 1
+            tag_name = TAG_PARSER.get('SMGR', {}).get('TIME', {}).get(tag, f"unknown_tag_{tag}")
+            if tag == 1:
+                date_time[tag_name] = struct.unpack('>H', response[index:index + 2])[0]
+                index += 2
+            else:
+                date_time[tag_name] = struct.unpack('>B', response[index:index + 1])[0]
+                index += 1
         
-        year = int.from_bytes(response[17:19], 'big')
-        month = int.from_bytes(response[20:21], 'big')
-        day = int.from_bytes(response[22:23], 'big')
-        hours = int.from_bytes(response[24:25], 'big')
-        minutes = int.from_bytes(response[26:27], 'big')
-        seconds = int.from_bytes(response[28:29], 'big')
-
-        return {
-            "year": year,
-            "month": month,
-            "day": day,
-            "hours": hours,
-            "minutes": minutes,
-            "seconds": seconds,
-        }
+        return date_time
     
     def _parse_product_info_response(self, response):
         product_info = {}

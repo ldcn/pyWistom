@@ -234,6 +234,14 @@ TAG_PARSER = {
             5: "mac_address",
             6: "listening_port",
         },
+        'TIME': {
+            1: "year",
+            2: "month",
+            3: "day",
+            4: "hour",
+            5: "minute",
+            6: "second",
+        },
     },
     'OCM#': {
         'WINS': {
