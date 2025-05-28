@@ -425,27 +425,6 @@ class WistomClient:
             index += 4
 
         return system_temperature
-
-
-        board_temp = struct.unpack('>f', response[17:21])[0]
-        sensor_temp = struct.unpack('>f', response[22:26])[0]
-        sensor_temp_derivative = struct.unpack('>f', response[27:31])[0]
-        conf_min_temp = struct.unpack('>f', response[32:36])[0]
-        conf_max_temp = struct.unpack('>f', response[37:41])[0]
-
-        # The response gives this value twice due to a bug in the API
-        # conf_max_temp_2 = struct.unpack('>f', response[42:46])[0] 
-        fpga_temp = struct.unpack('>f', response[47:51])[0]
-
-        return {
-            "board_temp": board_temp,
-            "sensor_temp": sensor_temp,
-            "sensor_temp_derivative": sensor_temp_derivative,
-            "conf_min_temp": conf_min_temp,
-            "conf_max_temp": conf_max_temp,
-            # "conf_max_temp_2": conf_max_temp_2,
-            "fpga_temp": fpga_temp,
-        }
     
     def _parse_list_snmp_trap_receivers_response(self, response):
         strings = response[16:].split(b'\x00')
