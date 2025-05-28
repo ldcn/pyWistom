@@ -242,6 +242,10 @@ TAG_PARSER = {
             5: "minute",
             6: "second",
         },
+        'UPTI': {
+            1: "uptime",
+            2: "app_uptime",
+        },
     },
     'OCM#': {
         'WINS': {

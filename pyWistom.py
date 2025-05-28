@@ -432,26 +432,8 @@ class WistomClient:
             tag = response[index]
             index += 1
             tag_name = TAG_PARSER.get('SMGR', {}).get('UPTI', {}).get(tag, f"unknown_tag_{tag}")
-            
-            if tag == 1:
-                # Tag 1 is a float representing the system uptime in seconds
-                system_uptime[tag_name] = struct.unpack('>f', response[index:index + 4])[0]
-                index += 4
-            elif tag == 2:
-                # Tag 2 is a float representing the application uptime in seconds
-                system_uptime[tag_name] = struct.unpack('>f', response[index:index + 4])[0]
-                index += 4
-            elif tag == 3:
-                # Tag 3 is a float representing the system load
-                system_uptime[tag_name] = struct.unpack('>f', response[index:index + 4])[0]
-                index += 4
-            else:
-                # Unknown tag, skip...
-                print(f"Unknown tag in system uptime response: {tag}")
-                index += 4
-        # If the response is not as expected, raise an error
-        if len(system_uptime) < 3:
-            raise ValueError("Unexpected response format for system uptime")
+            system_uptime[tag_name] = struct.unpack('>f', response[index:index + 4])[0]
+            index += 4
 
         return system_uptime
         
