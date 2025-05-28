@@ -253,6 +253,7 @@ TAG_PARSER = {
         'UPTI': {
             1: "uptime",
             2: "app_uptime",
+            3: "system_load_average",
         },
         'TEMP': {
             1: "board_temperature",
