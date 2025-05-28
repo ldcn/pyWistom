@@ -230,6 +230,10 @@ TAG_PARSER = {
             4: "stop_bits",
             5: "parity_bit",
         },
+        'INST': {
+            1: "snmp",
+            2: "obsolete",
+        },
         'IP##': {
             1: "ip_address",
             2: "subnet_mask",
