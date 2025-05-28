@@ -438,6 +438,18 @@ class WistomClient:
         return system_uptime
         
     def _parse_system_temperature_response(self, response):
+        system_temperature = {}
+        index = 16
+        while index < len(response):
+            tag = response[index]
+            index += 1
+            tag_name = TAG_PARSER.get('SMGR', {}).get('TEMP', {}).get(tag, f"unknown_tag_{tag}")
+            system_temperature[tag_name] = struct.unpack('>f', response[index:index + 4])[0]
+            index += 4
+
+        return system_temperature
+
+
         board_temp = struct.unpack('>f', response[17:21])[0]
         sensor_temp = struct.unpack('>f', response[22:26])[0]
         sensor_temp_derivative = struct.unpack('>f', response[27:31])[0]
