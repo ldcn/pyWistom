@@ -444,6 +444,17 @@ class WistomClient:
         }
     
     def _parse_smgr_inst_response(self, response):
+        index = 16
+        installed_features = {}
+        while index < len(response):
+            tag = response[index]
+            index += 1
+            tag_name = TAG_PARSER.get('SMGR', {}).get('INST', {}).get(tag, f"unknown_tag_{tag}")
+            installed_features[tag_name] = struct.unpack('>B', response[index:index + 1])[0]
+            index += 1
+
+        return installed_features
+    
         snmp_installed = bool.from_bytes(response[17:18])
         obsolete_installed = bool.from_bytes(response[19:20])
 
@@ -571,7 +582,6 @@ class WistomClient:
                         "spectrum_data_values": spectrum_data_values,
                     }
             return spectrum_data   
-         
         
     def _parse_wsns_port(self, response):
         sensor_ports = {}
@@ -674,8 +684,6 @@ class WistomClient:
                 frequency_error = struct.unpack('>d', response[index:index + 8])[0]
                 frequency_errors.append(frequency_error)
                 index += 8
-
-        
         
         # Tag 3-6 (linear fit equation and other data for calibration and error-correcting)
         
