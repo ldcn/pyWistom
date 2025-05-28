@@ -250,6 +250,14 @@ TAG_PARSER = {
             1: "uptime",
             2: "app_uptime",
         },
+        'TEMP': {
+            1: "board_temperature",
+            2: "sensor_temperature",
+            3: "sensor_temperature_derivative",
+            4: "configured_min_temperature",
+            5: "configured_max_temperature",
+            6: "fpga_temperature",
+        },
     },
     'OCM#': {
         'WINS': {
