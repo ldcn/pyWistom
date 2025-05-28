@@ -180,6 +180,10 @@ TAG_PARSER = {
             3: "user_level",
             4: "interfaces",
         },
+        'SINF': {
+            1: "user_name",
+            5: "process_id",
+        },
     },
     'PULF': {
         'REGV': {

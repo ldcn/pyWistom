@@ -284,8 +284,6 @@ class WistomClient:
             if (null_terminated_string_end == -1):
                 break
             user_name = payload[:null_terminated_string_end].decode('ascii')
-
-
             user_info[tag_name] = user_name
             index += (null_terminated_string_end - index + 1)
             tag = payload[index]
@@ -298,47 +296,26 @@ class WistomClient:
             
 
     def _parse_login_session_info_response(self, response, data=None):
-        
-        index = 0
-        logged_in_users = 0
-        data = response[16:]
-        parsed_data = {}
+        session_info = {}
+        number_of_users = 0
+        index = 16
 
-        while index < len(data):
-            # read the username tag
-            if index + 1 > len(data):
-                break
-            tag_user = data[index]
+        while index < len(response):
+            tag = response[index]
             index += 1
-
-            # Read the username
-            null_terminated_string_end = data.find(b'\x00', index)
-            if null_terminated_string_end == -1:
-                break
-            user_string = data[index:null_terminated_string_end].decode('ascii')
-            index += (null_terminated_string_end - index + 1)
-
-            # Read the process id tag
-            if index + 1 > len(data):
-                break
-            tag_pid = data[index]
-            index += 1
-
-            # Read the process id
-            if index + 4 > len(data):
-                break
-            pid = struct.unpack('>I', data[index:index + 4])[0]
-            index += 4
-
-            # parse the data
-            logged_in_users += 1
-            parsed_data[f"user_{logged_in_users}"] = user_string
-            parsed_data[f"process_id_{logged_in_users}"] = pid
-
-        return {
-            "logged_in_users": logged_in_users,
-            "users": parsed_data
-        }
+            tag_name = TAG_PARSER.get('LGIN', {}).get('SINF', {}).get(tag, f"unknown_tag_{tag}") + f"_{number_of_users}"
+            if tag == 1:
+                string_end = response.find(b'\x00', index)
+                if string_end == -1:
+                    break
+                session_info[tag_name] = response[index:string_end].decode('ascii')
+                index += (string_end - index + 1)
+            elif tag == 5:
+                session_info[tag_name] = struct.unpack('>I', response[index:index + 4])[0]
+                index += 4
+            number_of_users += 1
+                
+        return session_info
 
     def _parse_serial_response(self, response, data=None):
         serial_settings = {}
