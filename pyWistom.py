@@ -495,7 +495,6 @@ class WistomClient:
         :param data: Optional data parameter, not used in this implementation.
         :return: A dictionary containing the parsed spectrum data.
         """
-        print(response)
         spectrum_data = {}
         index = 16
         if data == None:
