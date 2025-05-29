@@ -75,6 +75,10 @@ TAG_PARSER = {
             2: "obsolete",
             3: "obsolete",
         },
+        'SLTR': {
+            1: "trap_ip_address",
+            2: "trap_port",
+        },
         'TIME': {
             1: "year",
             2: "month",

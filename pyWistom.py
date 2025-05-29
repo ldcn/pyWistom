@@ -434,14 +434,29 @@ class WistomClient:
         return system_temperature
     
     def _parse_list_snmp_trap_receivers_response(self, response):
-        strings = response[16:].split(b'\x00')
-        trap_ip_address = strings[0][1:].decode('ascii')
-        trap_port = int.from_bytes(response[-2:], 'big')
+        snmp_trap_receivers = {}
+        index = 16
+        while index < len(response):
+            tag = response[index]
+            index += 1
+            tag_name = TAG_PARSER.get('SMGR', {}).get('SLTR', {}).get(tag, f"unknown_tag_{tag}")
+            if tag == 1:
+                # The first tag is a null-terminated string for the IP address
+                null_terminated_string_end = response.find(b'\x00', index)
+                if null_terminated_string_end == -1:
+                    break
+                snmp_trap_receivers[tag_name] = response[index:null_terminated_string_end].decode('ascii')
+                index = null_terminated_string_end + 1
+            elif tag == 2:
+                # The second tag is a 2-byte integer for the port number
+                snmp_trap_receivers[tag_name] = struct.unpack('>H', response[index:index + 2])[0]
+                index += 2
+            else:
+                # For any other tags, just read the raw value as bytes (length 1)
+                snmp_trap_receivers[tag_name] = response[index:index + 1]
+                index += 1
 
-        return {
-            "trap_ip_address": trap_ip_address,
-            "trap_port": trap_port,
-        }
+        return snmp_trap_receivers
     
     def _parse_snmp_config_response(self, response):
         snmp_config = {}
