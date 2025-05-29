@@ -594,6 +594,14 @@ TAG_PARSER = {
     }
 }
 
+SPECTRUM_TYPE = {
+    1: "Sensor spectrum",
+    2: "Wavelength spectrum",
+    3: "Interferometer spectrum",
+    4: "White light spectrum",
+    5: "Frequency scale",
+}
+
 PORT_TYPE = {
     0: "Inactive",
     1: "Sensor port",

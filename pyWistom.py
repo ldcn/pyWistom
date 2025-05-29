@@ -17,6 +17,7 @@ from wistomconstants import (
     RESPONSE_PARSER,
     ERROR_CODE,
     TAG_PARSER,
+    SPECTRUM_TYPE,
     PORT_TYPE,
 )
 
@@ -483,24 +484,29 @@ class WistomClient:
         :param data: Optional data parameter, not used in this implementation.
         :return: A dictionary containing the parsed spectrum data.
         """
-        print(data)
+        print(response)
         spectrum_data = {}
         index = 16
         if data == None:
             while index < len(response):
                 tag = response[index]
                 index += 1
-
                 tag_name = TAG_PARSER.get('WSNS', {}).get('DATA', {}).get(tag, f"unknown_tag_{tag}")
                 value = response[index]
                 spectrum_data[tag_name] = bool(value)
                 index +=1
             return spectrum_data
-        else:
-            if data[1] in {1, 2, 3, 4, 5}:
+        if data[0] == 0x0a: # 0x0a (10) is the GET tag for spectrum type
+            # The value entered after the 0x0a tag can be any value
+            # data[1] == 0 does the same as data == None
+            # data[1] in {1, 2, 3, 4, 5} is documented in 100051 as spectrum type
+            # data[1] == 6 is also used but is not documented
+            # data[1] > 6 will return the same data as data[1] == 1
+            if data[1] in {1, 2, 3, 4, 5, 6}:
                 spectrum_data_values = []
                 tag = response[index]
                 index += 1
+                spectrum_type = SPECTRUM_TYPE.get(data[1], "Unknown")
                 tag_name = TAG_PARSER.get('WSNS', {}).get('DATA', {}).get(tag, f"unknown_tag_{tag}")
                 spectrum_data_length = struct.unpack('>I', response[index:index + 4])[0]
                 index += 4
@@ -509,6 +515,7 @@ class WistomClient:
                     spectrum_data_values.append(spectrum_value)
                     index += 4
                 spectrum_data = {
+                    "spectrum_type": spectrum_type,
                     "spectrum_data_length": spectrum_data_length,
                     "spectrum_data_values": spectrum_data_values,
                 }
