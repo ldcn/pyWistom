@@ -736,6 +736,38 @@ class WistomClient:
             index +=8
         
         return wistsense_parameters
+    
+    def _parse_wsns_filt(self, response):
+        """
+        Parses the WSNS FILT response.
+        :param response: The raw response from the WSNS FILT command.
+        :return: A dictionary containing the output.
+        """
+        wsns_filt = {}
+        index = 16
+        while index < len(response):
+            tag = response[index]
+            index += 1
+            tag_name = TAG_PARSER.get('WSNS', {}).get('FILT', {}).get(tag, f"unknown_tag_{tag}")
+            raise NotImplementedError("WSNS FILT not implemented yet.")
+
+        return wsns_filt
+    
+    def _parse_wsns_rawb(self, response):
+        """
+        Parses the WSNS RAWB response.
+        :param response: The raw response from the WSNS RAWB command.
+        :return: A dictionary containing the parsed raw data.
+        """
+        wsns_rawb = {}
+        index = 16
+        while index < len(response):
+            tag = response[index]
+            index += 1
+            tag_name = TAG_PARSER.get('WSNS', {}).get('RAWB', {}).get(tag, f"unknown_tag_{tag}")
+            raise NotImplementedError("WSNS RAWB not implemented yet.")
+
+        return wsns_rawb
 
 if __name__ == "__main__":
 
