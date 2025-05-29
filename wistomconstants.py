@@ -242,6 +242,11 @@ TAG_PARSER = {
             5: "mac_address",
             6: "listening_port",
         },
+        'SCFG': {
+            1: "agent_port",
+            2: "obsolete",
+            3: "obsolete",
+        },
         'TIME': {
             1: "year",
             2: "month",

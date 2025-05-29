@@ -438,11 +438,16 @@ class WistomClient:
         }
     
     def _parse_snmp_config_response(self, response):
-        agent_port = int.from_bytes(response[-2:], 'big')
+        snmp_config = {}
+        index = 16
+        while index < len(response):
+            tag = response[index]
+            index += 1
+            tag_name = TAG_PARSER.get('SMGR', {}).get('SCFG', {}).get(tag, f"unknown_tag_{tag}")
+            snmp_config[tag_name] = struct.unpack('>H', response[index:index + 2])[0]
+            index += 2
 
-        return {
-            "agent_port": agent_port,
-        }
+        return snmp_config
     
     def _parse_smgr_inst_response(self, response):
         index = 16
