@@ -13,12 +13,18 @@ from wistomconstants import (
     COMMAND_ID,
     ALARM_ID,
     LOGIN_RESULT,
-    RESPONSE_HEADER_PARSER,
-    RESPONSE_PARSER,
     ERROR_CODE,
-    TAG_PARSER,
     SPECTRUM_TYPE,
     PORT_TYPE,
+)
+
+from wistomresponses import (
+    RESPONSE_HEADER_PARSER,
+    RESPONSE_PARSER,
+)
+
+from wistomtags import (
+    TAG_PARSER,
 )
 
 from wistomconnection import WistomConnection
@@ -606,8 +612,6 @@ class WistomClient:
                 "number_of_peaks": number_of_frequency_peaks,
                 "peak_frequencies": peak_frequencies,
             }
-
-
         calibration_data = {}
         
         # Tag 7, 3, 4, 5, 6 are used for calibration and error correction (?)
