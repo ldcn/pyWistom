@@ -53,7 +53,6 @@ docs:
   image: python:3.12
   script:
     - pip install sphinx
-    - sphinx-quickstart --quiet --project "pyWistom" --author "Your Name" --sep --makefile --batchfile --ext-autodoc --no-use-sep --no-batchfile --no-makefile --no-git --no-prompt
     - sphinx-apidoc -o docs/source .
     - sphinx-build -b html docs/source docs/build/html
   artifacts:
