@@ -28,6 +28,11 @@ lint:
   image: python:3.12
   script:
     - pip install flake8
+    - mkdir -p flake8-report
+    - flake8 . --output-file=flake8-report/flake8.txt || true
+    - flake8 . --output-file=flake8-report/flake8_junit.xml --format=junit || true
+    - flake8 . --output-file=flake8-report/flake8.json --format=json || true
+    - flake8 . --output-file=flake8-report/flake8.html --format=html || true
     - flake8 . --format=html || true
   artifacts:
     when: always
