@@ -517,7 +517,7 @@ class WistomClient:
         return system_temperature
 
     def _parse_list_snmp_trap_receivers_response(self, response):
-        snmp_trap_receivers = {}
+        trap_receivers = {}
         index = 16
         while index < len(response):
             tag = response[index]
@@ -529,21 +529,21 @@ class WistomClient:
                 string_end = response.find(b'\x00', index)
                 if string_end == -1:
                     break
-                snmp_trap_receivers[tag_name] = response[index:string_end].decode(
+                trap_receivers[tag_name] = response[index:string_end].decode(
                     'ascii')
                 index = string_end + 1
             elif tag == 2:
                 # The second tag is a 2-byte integer for the port number
-                snmp_trap_receivers[tag_name] = struct.unpack(
+                trap_receivers[tag_name] = struct.unpack(
                     '>H', response[index:index + 2])[0]
                 index += 2
             else:
                 # For any other tags,
                 # just read the raw value as bytes (length 1)
-                snmp_trap_receivers[tag_name] = response[index:index + 1]
+                trap_receivers[tag_name] = response[index:index + 1]
                 index += 1
 
-        return snmp_trap_receivers
+        return trap_receivers
 
     def _parse_snmp_config_response(self, response):
         snmp_config = {}
@@ -652,7 +652,7 @@ class WistomClient:
 
             tag_name = TAG_PARSER.get('WSNS', {}).get(
                 'PORT', {}).get(port_tag, f'unknown_port_{port_tag}')
-            type_name = PORT_TYPE.get(response[index], f"Unknown")
+            type_name = PORT_TYPE.get(response[index], "Unknown")
             sensor_ports[tag_name] = type_name
             index += 1
 
@@ -664,19 +664,19 @@ class WistomClient:
         peak_amplitudes_ports = {}
         index = 16  # Start after header
 
-        # Tag 101-116 (Frequency of each peak in spectrum, one spectrum per port)
+        # Tag 101-116 (Frequency of each peak in spectrum, per port)
         # Tag 151-166 (FWHM of each peak)
         # Tag 201-216 (Amplitudes of each peak)
         # First value after each tag is the number of peaks.
 
         while index < len(response):
             port_tag = response[index]
-
-            if port_tag == 7:  # Tag 7, 3, 4, 5, 6 comes after peak data in this order and is parsed differently
+            # Tag 7, 3, 4, 5, 6 comes after peak data in this order
+            # and is parsed differently
+            if port_tag == 7:
                 break
             index += 1
 
-            # Resolve port_tag to its string representation using TAG_PARSER in wistomconstants
             tag_name = TAG_PARSER.get('WSNS', {}).get(
                 'NEXT', {}).get(port_tag, f"unknown_tag_{port_tag}")
 
@@ -733,7 +733,8 @@ class WistomClient:
             }
         calibration_data = {}
 
-        # Tag 7, 3, 4, 5, 6 are used for calibration and error correction (?)
+        # Tag 7, 3, 4, 5, 6 are used for
+        # calibration and error correction (?)
 
         # Tag 7: Frequency errors
         while index < len(response):
@@ -754,7 +755,10 @@ class WistomClient:
                 frequency_errors.append(frequency_error)
                 index += 8
 
-        # Tag 3-6 (linear fit equation and other data for calibration and error-correcting)
+        # Tag 3-6
+        #
+        # linear fit equation and other data
+        # for calibration and error-correcting
 
         # Tag 3 & 4 (linear fits)
         while index < len(response):
@@ -766,9 +770,12 @@ class WistomClient:
                 'NEXT', {}).get(tag, f"unknown_tag_{tag}")
             calibration_data[tag_name] = None
             calibration_data[tag_name] = {
-                'slope': struct.unpack('>d', response[index:index + 8])[0],
-                'intercept': struct.unpack('>d', response[index + 8:index + 16])[0],
-                'r_value': struct.unpack('>d', response[index + 16:index + 24])[0]
+                'slope': struct.unpack(
+                    '>d', response[index:index + 8])[0],
+                'intercept': struct.unpack(
+                    '>d', response[index + 8:index + 16])[0],
+                'r_value': struct.unpack(
+                    '>d', response[index + 16:index + 24])[0]
             }
             index += 24
 
@@ -778,8 +785,10 @@ class WistomClient:
         tag_name = TAG_PARSER.get('WSNS', {}).get(
             'NEXT', {}).get(tag, f"unknown_tag_{tag}")
         calibration_data[tag_name] = {
-            'reference_lines': struct.unpack('>I', response[index:index + 4])[0],
-            'zero_crossings': struct.unpack('>I', response[index + 4: index + 8])[0]
+            'reference_lines': struct.unpack(
+                '>I', response[index:index + 4])[0],
+            'zero_crossings': struct.unpack(
+                '>I', response[index + 4: index + 8])[0]
         }
         index += 8
 
@@ -790,8 +799,10 @@ class WistomClient:
         tag_name = TAG_PARSER.get('WSNS', {}).get(
             'NEXT', {}).get(tag, f"unknown_tag_{tag}")
         calibration_data[tag_name] = {
-            'first': struct.unpack('>d', response[index:index + 8])[0],
-            'last': struct.unpack('>d', response[index + 8:index + 16])[0]
+            'first': struct.unpack(
+                '>d', response[index:index + 8])[0],
+            'last': struct.unpack(
+                '>d', response[index + 8:index + 16])[0]
         }
         index += 16
 
@@ -802,7 +813,8 @@ class WistomClient:
             "calibration_data": calibration_data,
         }
 
-    # There are bugs in the code and mistakes in the documentation for WSNS PARA.
+    # There are bugs in the code and mistakes
+    # in the documentation for WSNS PARA.
     # Update this parser function after issues are solved.
     def _parse_wsns_para(self, response):
         wistsense_parameters = {}
