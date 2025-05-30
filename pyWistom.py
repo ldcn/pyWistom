@@ -881,6 +881,7 @@ class WistomClient:
             index += 1
             tag_name = TAG_PARSER.get('WSNS', {}).get(
                 'FILT', {}).get(tag, f"unknown_tag_{tag}")
+            wsns_filt[tag_name] = 0
             raise NotImplementedError("WSNS FILT not implemented yet.")
 
         return wsns_filt
@@ -898,6 +899,7 @@ class WistomClient:
             index += 1
             tag_name = TAG_PARSER.get('WSNS', {}).get(
                 'RAWB', {}).get(tag, f"unknown_tag_{tag}")
+            wsns_rawb[tag_name] = 0
             raise NotImplementedError("WSNS RAWB not implemented yet.")
 
         return wsns_rawb
