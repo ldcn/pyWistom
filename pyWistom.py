@@ -421,12 +421,12 @@ class WistomClient:
                 index += 1
                 tag_name = TAG_PARSER.get('SMGR', {}).get(
                     'IP##', {}).get(tag, f"unknown_tag_{tag}")
-                null_terminated_string_end = response.find(b'\x00', index)
-                if null_terminated_string_end == -1:
+                string_end = response.find(b'\x00', index)
+                if string_end == -1:
                     break
-                network_info[tag_name] = response[index:null_terminated_string_end].decode(
+                network_info[tag_name] = response[index:string_end].decode(
                     'ascii')
-                index = null_terminated_string_end + 1
+                index = string_end + 1
 
         tag = response[index]
         index += 1
@@ -526,19 +526,20 @@ class WistomClient:
                 'SLTR', {}).get(tag, f"unknown_tag_{tag}")
             if tag == 1:
                 # The first tag is a null-terminated string for the IP address
-                null_terminated_string_end = response.find(b'\x00', index)
-                if null_terminated_string_end == -1:
+                string_end = response.find(b'\x00', index)
+                if string_end == -1:
                     break
-                snmp_trap_receivers[tag_name] = response[index:null_terminated_string_end].decode(
+                snmp_trap_receivers[tag_name] = response[index:string_end].decode(
                     'ascii')
-                index = null_terminated_string_end + 1
+                index = string_end + 1
             elif tag == 2:
                 # The second tag is a 2-byte integer for the port number
                 snmp_trap_receivers[tag_name] = struct.unpack(
                     '>H', response[index:index + 2])[0]
                 index += 2
             else:
-                # For any other tags, just read the raw value as bytes (length 1)
+                # For any other tags,
+                # just read the raw value as bytes (length 1)
                 snmp_trap_receivers[tag_name] = response[index:index + 1]
                 index += 1
 
@@ -573,8 +574,8 @@ class WistomClient:
         return installed_features
 
     ###################################################################
-    ## Pulse frequency control API function parsers                  ##
-    ## For reference, see Wistom API documentation (document 100051) ##
+    # Pulse frequency control API function parsers
+    # For reference, see Wistom API documentation (document 100051)
     ###################################################################
 
     def _parse_frequency_regulator_values(self, response):
@@ -590,10 +591,10 @@ class WistomClient:
             index += 8
         return frequency_regulator_values
 
-    ###################################################################
-    ## Wistsense API function parsers                                ##
-    ## For reference, see Wistom API documentation (document 100051) ##
-    ###################################################################
+    # ------------------------------------------------------------------
+    # Wistsense API function parsers
+    # For reference, see Wistom API documentation (document 100051)
+    # ------------------------------------------------------------------
 
     def _parse_wsns_data(self, response, data=None):  # TODO Fix this function
         """
@@ -604,7 +605,7 @@ class WistomClient:
         """
         spectrum_data = {}
         index = 16
-        if data == None:
+        if data is None:
             while index < len(response):
                 tag = response[index]
                 index += 1
@@ -617,7 +618,7 @@ class WistomClient:
         if data[0] == 0x0a:  # 0x0a (10) is the GET tag for spectrum type
             # The value entered after the 0x0a tag can be any value
             # data[1] == 0 does the same as data == None
-            # data[1] in {1, 2, 3, 4, 5} is documented in 100051 as spectrum type
+            # data[1] in {1, 2, 3, 4, 5} is documented as spectrum type
             # data[1] == 6 is also used but is not documented
             # data[1] > 6 will return the same data as data[1] == 1
             if data[1] in {1, 2, 3, 4, 5, 6}:
@@ -650,7 +651,7 @@ class WistomClient:
             index += 1
 
             tag_name = TAG_PARSER.get('WSNS', {}).get(
-                'PORT', {}).get(port_tag, f"unknown_port_{port_tag}")
+                'PORT', {}).get(port_tag, f'unknown_port_{port_tag}')
             type_name = PORT_TYPE.get(response[index], f"Unknown")
             sensor_ports[tag_name] = type_name
             index += 1
