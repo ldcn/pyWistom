@@ -1,10 +1,10 @@
-## Tag parsers 
+# Tag parsers
 
 TAG_PARSER = {
     'LGIN': {
         'UINF': {
             1: "user_name",
-            2: "password", # hidden, added for completeness
+            2: "password",  # hidden, added for completeness
             3: "user_level",
             4: "interfaces",
         },
@@ -21,7 +21,7 @@ TAG_PARSER = {
             4: "q_ptop",
             5: "q_slope",
             6: "current_frequency",
-            7: "last_frequency", 
+            7: "last_frequency",
             8: "q_square_sum",
             9: "best_resonance_frequency",
             10: "temperature_frequency",
@@ -31,7 +31,7 @@ TAG_PARSER = {
     'SMGR': {
         'INFO': {
             1: "hardware_product_number",
-            2: "hardware_id_number", 
+            2: "hardware_id_number",
             3: "hardware_revision",
             4: "hardware_serial_number",
             17: "sensor_product_number",
@@ -114,30 +114,30 @@ TAG_PARSER = {
     },
     'OPM#': {
         'AVRG': {
-            1: "averages", # U32
+            1: "averages",  # U32
         },
         'ENAB': {
-            1: "toggle_enable", # U8 (bool)
+            1: "toggle_enable",  # U8 (bool)
         },
         "CALC": {
-            1: "toggle_power_calc", # U8 (bool)
+            1: "toggle_power_calc",  # U8 (bool)
         },
         "CNFG": {
-            1: "envelope_average_samples", #U8
-            2: "bias_moving_average", #U16
-            3: "spectrum_moving_average", #U16
-            4: "side_attenuation", #U8
+            1: "envelope_average_samples",  # U8
+            2: "bias_moving_average",  # U16
+            3: "spectrum_moving_average",  # U16
+            4: "side_attenuation",  # U8
         },
         "OSNR": {
-            1: "osnr_variant", # U8
-            2: "measured_bandwidth", # F64
-            3: "reference_bandwidth", # F64
-            4: "max_distance_osnr_noise_measurement", # F64
-            5: "low_limit_noise_estimation", # F64
-            6: "noise_level_samples", # U32
+            1: "osnr_variant",  # U8
+            2: "measured_bandwidth",  # F64
+            3: "reference_bandwidth",  # F64
+            4: "max_distance_osnr_noise_measurement",  # F64
+            5: "low_limit_noise_estimation",  # F64
+            6: "noise_level_samples",  # U32
         },
         "CHCO": {
-            1: "process_configured_channels", # U8 (bool)
+            1: "process_configured_channels",  # U8 (bool)
             2: "static_integration_interval",
             3: "peak_integration_interval",
             4: "search_unconfigured_channels",
@@ -314,7 +314,7 @@ TAG_PARSER = {
         'CHNL': {
             1: "channel_id_map",
             2: "channel_id",
-            100: "switch_port", # Appears in this order in the documentation 
+            100: "switch_port",  # Appears in this order in the documentation
             3: "activate_mask",
             4: "nominal_frequency",
             5: "nominal_power",
@@ -413,7 +413,7 @@ TAG_PARSER = {
             2: "normalized_spectrum",
             11: "spectrum_data"
         },
-        'PARA': { # According to documentation. May be incorrect.
+        'PARA': {  # According to documentation. May be incorrect.
             1: "lut_enabled",
             2: "peak_height_reference_lines",
             3: "frequency_delta",

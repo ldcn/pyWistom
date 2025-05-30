@@ -1,6 +1,7 @@
 import socket
 import ssl
 
+
 class WistomConnection:
     def __init__(self, host, port):
         self.host = host
@@ -34,7 +35,7 @@ class WistomConnection:
         self.socket.sendall(payload)
         response = self.socket.recv(1024)
         return response
-    
+
     def increment_token(self):
         self.token += 1
         return self.token

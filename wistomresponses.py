@@ -1,7 +1,7 @@
 from wistomconstants import COMMAND_ID
 
-## Parsers for response headers
-## Header structure is dependent on the command id
+# Parsers for response headers
+# Header structure is dependent on the command id
 
 RESPONSE_HEADER_PARSER = {
     COMMAND_ID["LOGINRES"]: "_parse_loginres_header",
@@ -12,14 +12,17 @@ RESPONSE_HEADER_PARSER = {
 }
 
 
-## Response parsers for GET requests
+# Response parsers for GET requests
 ##
-## Commands that have no GET response (SET only) are included for error handling
-## See API documentation or page 83-112 in the Wistom User Guide
+# Commands that have no GET response (SET only)
+# are included for error handling
+# See API documentation or page 83-112 in the Wistom User Guide
 
 RESPONSE_PARSER = {
-    "LGIN": { # Login / User management operations
-        # The "LGIN" app-id is used both for logging into a wistom unit and when logged in
+    "LGIN": {  # Login / User management operations
+        # The "LGIN" app-id is used both for logging
+        # into a wistom unit and when logged in
+        #
         # When logging in, the op-id "API2" will use API v2 responses,
         # while any other 4-letter combination will use API v1.
         # However "LGIN" is the op-id used in all proximion software.
@@ -28,12 +31,12 @@ RESPONSE_PARSER = {
         # that are shown below.
         "LGIN": "_parse_apiv1_login_response",
         "API2": "_parse_apiv2_login_response",
-        "CPWD": "", # SET only
-        "COPW": "", # SET only
-        "UADD": "", # SET only
-        "UDEL": "", # SET only
+        "CPWD": "",  # SET only
+        "COPW": "",  # SET only
+        "UADD": "",  # SET only
+        "UDEL": "",  # SET only
         "UINF": "_parse_login_user_info_response",
-        "SINF": "_parse_login_session_info_response", 
+        "SINF": "_parse_login_session_info_response",
     },
     "ALMH": {
         # Alarm handler operations here
@@ -43,7 +46,7 @@ RESPONSE_PARSER = {
         "AVRG": "_parse_opm_averages_response",
         "ENAB": "_parse_opm_enable_response",
         "CALC": "_parse_opm_power_calc_response",
-        "CNFG": "_parse_opm_config_response", # incorrect description in 100051
+        "CNFG": "_parse_opm_config_response",  # incorrect description
         "OSNR": "_parse_opm_osnr_config_response",
         "CHCO": "_parse_opm_channel_config_response",
         "FRQO": "_parse_opm_frequency_option_response",
@@ -63,7 +66,7 @@ RESPONSE_PARSER = {
         "SWHA": "_parse_opm_switch_handling_response",
     },
 
-    "PULF": { # Pulse frequency control
+    "PULF": {  # Pulse frequency control
         "COMP": "_parse_compensation_toggle",
         "PULS": "_parse_pulse_resonance_spectrum",
         "REGZ": "_parse_frequency_z_regulator",
@@ -74,30 +77,30 @@ RESPONSE_PARSER = {
         "REGP": "_parse_frequency_pid_regulator",
     },
 
-    "SMGR": { # System Manager operations
-        "REST": "", # SET only
+    "SMGR": {  # System Manager operations
+        "REST": "",  # SET only
         "IP##": "_parse_network_info_response",
-        "FLSH": "", # SET only
+        "FLSH": "",  # SET only
         "SER#": "_parse_serial_response",
         "TIME": "_parse_datetime_response",
         "INFO": "_parse_product_info_response",
         "TEMP": "_parse_system_temperature_response",
         "DUMP": "_parse_smgr_dump_response",
-        "CLRD": "", # SET only
+        "CLRD": "",  # SET only
         "UPTI": "_parse_system_uptime_response",
         "INST": "_parse_smgr_inst_response",
         "SCFG": "_parse_snmp_config_response",
-        "SATR": "", # SET only
-        "SDTR": "", # SET only
+        "SATR": "",  # SET only
+        "SDTR": "",  # SET only
         "SLTR": "_parse_list_snmp_trap_receivers_response",
-        "LED#": "_parse_smgr_led_response", # Not implemented
+        "LED#": "_parse_smgr_led_response",  # Not implemented
     },
 
     "SPEC": {
         # Spectrum parameter operations here
     },
 
-    "WSNS": { # Wistsense operations
+    "WSNS": {  # Wistsense operations
         "ENAB": "_parse_wistsense_enable",
         "PORT": "_parse_wsns_port",
         "DATA": "_parse_wsns_data",

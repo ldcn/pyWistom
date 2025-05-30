@@ -1,4 +1,4 @@
-## Command identifiers (Chapter 11 Tables 11-2 to 11-10 in Wistom User Guide)
+# Command identifiers (Chapter 11 Tables 11-2 to 11-10 in Wistom User Guide)
 
 COMMAND_ID = {
     "LOGIN": b'\x00\x01',
@@ -12,7 +12,7 @@ COMMAND_ID = {
     "GETERR": b'\x02\x04',
 }
 
-## Alarm command identifiers (Chapter 11 Tables 11-11 to 11-15 in Wistom User Guide)
+# Alarm command identifiers (Chapter 11 Tables 11-11 to 11-15 in Wistom User Guide)
 
 ALARM_ID = {
     "NO_TIME": b'\x01\x05',     # Alarm type 0 (no time stamp)
@@ -25,11 +25,11 @@ ALARM_ID = {
 # Login result codes (described in page 82 Table 11-18 in Wistom User Guide)
 
 LOGIN_RESULT = {
-    "UL1": b'\x00\x00\x00\x01', # Logged in with user level 1
-    "UL2": b'\x00\x00\x00\x02', # Logged in with user level 2
-    "UL3": b'\x00\x00\x00\x03', # Logged in with user level 3
-    "UL4": b'\x00\x00\x00\x04', # Logged in with user level 4
-    "UL5": b'\x00\x00\x00\x05', # Logged in with user level 5
+    "UL1": b'\x00\x00\x00\x01',  # Logged in with user level 1
+    "UL2": b'\x00\x00\x00\x02',  # Logged in with user level 2
+    "UL3": b'\x00\x00\x00\x03',  # Logged in with user level 3
+    "UL4": b'\x00\x00\x00\x04',  # Logged in with user level 4
+    "UL5": b'\x00\x00\x00\x05',  # Logged in with user level 5
     "MAX_USERS_LOGGED_IN": b'\x10\x00\x00\x00',
     "MAX_USERS_SYSTEM": b'\x10\x00\x00\x01',
     "MAX_LOGIN_ATTEMPTS": b'\x10\x00\x00\x02',
@@ -40,7 +40,7 @@ LOGIN_RESULT = {
 }
 
 ERROR_CODE = {
-    b'\x00\x00': "No error", # this "error" is in the api documentation
+    b'\x00\x00': "No error",  # this "error" is in the api documentation
     b'\x00\x01': "Unknown error",
     b'\x00\x02': "No response",
     b'\x00\x03': "Request failed",
@@ -73,5 +73,5 @@ PORT_TYPE = {
     1: "Sensor port",
     2: "Gas cell reference port",
     3: "Interferometer port",
-    4: "Interferometer port", # difference?
+    4: "Interferometer port",  # difference?
 }
