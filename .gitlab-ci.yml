@@ -53,11 +53,11 @@ docs:
   image: python:3.12
   script:
     - pip install sphinx
-    - sphinx-apidoc -o docs/source .
-    - sphinx-build -b html docs/source docs/build/html
+    - sphinx-apidoc -o docs .
+    - sphinx-build -b html docs docs/_build/html
   artifacts:
     paths:
-      - docs/build/html
+      - docs/_build/html
 
 deploy:
   stage: deploy
