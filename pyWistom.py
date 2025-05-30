@@ -285,7 +285,8 @@ class WistomClient:
             "SET Not acknowledged": f"{app_id} {op_id}",
             "Token": f"{token}",
             "Error code": ERROR_CODE[error_code],
-            "Tag number": int.from_bytes(tag_number, 'big') if tag_number != b'\x00\x00' else None
+            "Tag number": int.from_bytes(tag_number, 'big')
+            if tag_number != b'\x00\x00' else None
         }
 
     def _parse_geterr_header(self, response):
@@ -299,7 +300,8 @@ class WistomClient:
             "GET Error": f"{app_id} {op_id}",
             "Token": f"{token}",
             "Error code": ERROR_CODE[error_code],
-            "Tag number": int.from_bytes(tag_number, 'big') if tag_number != b'\x00\x00' else None
+            "Tag number": int.from_bytes(tag_number, 'big')
+            if tag_number != b'\x00\x00' else None
         }
 
     def _parse_getres_header(self, response):
@@ -330,8 +332,8 @@ class WistomClient:
         }
 
     ###################################################################
-    ## Parsers for getRes responses                                  ##
-    ## For reference, see Wistom API documentation (document 100051) ##
+    # Parsers for getRes responses
+    # For reference, see Wistom API documentation (document 100051)
     ###################################################################
 
     def _parse_login_user_info_response(self, response, data=None):
