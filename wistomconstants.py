@@ -12,7 +12,8 @@ COMMAND_ID = {
     "GETERR": b'\x02\x04',
 }
 
-# Alarm command identifiers (Chapter 11 Tables 11-11 to 11-15 in Wistom User Guide)
+# Alarm command identifiers
+# (Chapter 11 Tables 11-11 to 11-15 in Wistom User Guide)
 
 ALARM_ID = {
     "NO_TIME": b'\x01\x05',     # Alarm type 0 (no time stamp)

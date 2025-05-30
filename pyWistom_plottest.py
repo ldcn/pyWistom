@@ -1,4 +1,5 @@
-from pyWistom import *
+from pyWistom import WistomClient, COMMAND_ID
+from wistomconfig import HOST, PORT, USER_ID, PASSWORD
 import numpy as np
 
 with WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
@@ -9,7 +10,8 @@ with WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
     import matplotlib.pyplot as plt
 
     # Assuming spectrum_data is a list or array of numerical values
-    if isinstance(spectrum_data['response']['spectrum_data_values'], (list, np.ndarray)):
+    if isinstance(spectrum_data['response']['spectrum_data_values'],
+                  (list, np.ndarray)):
         plt.plot(spectrum_data['response']['spectrum_data_values'])
         plt.title("Spectrum Data")
         plt.xlabel("Index")
