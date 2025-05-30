@@ -11,7 +11,6 @@ from wistomconfig import (
 
 from wistomconstants import (
     COMMAND_ID,
-    ALARM_ID,
     LOGIN_RESULT,
     ERROR_CODE,
     SPECTRUM_TYPE,
@@ -68,45 +67,96 @@ class WistomClient:
 
     def get_smgr_info(self):
         self.__increment_token()
-        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'INFO', b'')
+        return self.__send_request(
+            COMMAND_ID['GET'],
+            b'SMGR',
+            b'INFO',
+            b''
+        )
 
     def get_smgr_network_info(self):
         self.__increment_token()
-        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'IP##', b'')
+        return self.__send_request(
+            COMMAND_ID['GET'],
+            b'SMGR',
+            b'IP##',
+            b''
+        )
 
     def get_smgr_serial_settings(self):
         self.__increment_token()
-        # There is only one serial interface, 0x01, but supplying the (tag number and) interface number is required.
+        # There is only one serial interface, 0x01,
+        # but supplying the (tag number and) interface number is required.
         # If not supplied, the request will result in a GETERR.
-        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'SER#', b'\x01\x01')
+        return self.__send_request(
+            COMMAND_ID['GET'],
+            b'SMGR',
+            b'SER#',
+            b'\x01\x01'
+        )
 
     def get_smgr_time(self):
         self.__increment_token()
-        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'TIME', b'')
+        return self.__send_request(
+            COMMAND_ID['GET'],
+            b'SMGR',
+            b'TIME',
+            b''
+        )
 
     def get_smgr_temp(self):
         self.__increment_token()
-        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'TEMP', b'')
+        return self.__send_request(
+            COMMAND_ID['GET'],
+            b'SMGR',
+            b'TEMP',
+            b''
+        )
 
     def get_smgr_uptime(self):
         self.__increment_token()
-        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'UPTI', b'')
+        return self.__send_request(
+            COMMAND_ID['GET'],
+            b'SMGR',
+            b'UPTI',
+            b''
+        )
 
     def get_snmp_agent_listening_port(self):
         self.__increment_token()
-        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'SCFG', b'')
+        return self.__send_request(
+            COMMAND_ID['GET'],
+            b'SMGR',
+            b'SCFG',
+            b''
+        )
 
     def get_snmp_trap_receivers(self):
         self.__increment_token()
-        return self.__send_request(COMMAND_ID['GET'], b'SMGR', b'SLTR', b'')
+        return self.__send_request(
+            COMMAND_ID['GET'],
+            b'SMGR',
+            b'SLTR',
+            b''
+        )
 
     def custom_api_request(self, command_id, app_id, op_id, data):
         self.__increment_token()
-        return self.__send_request(command_id, app_id, op_id, data)
+        return self.__send_request(
+            command_id,
+            app_id,
+            op_id,
+            data
+        )
 
     def custom_api_request_raw(self, command_id, app_id, op_id, data):
         self.__increment_token()
-        return self.__send_request(command_id, app_id, op_id, data)
+        return self.__send_request(
+            command_id,
+            app_id,
+            op_id,
+            data
+        )
 
     ##################
     # Private methods
