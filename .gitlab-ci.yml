@@ -28,7 +28,7 @@ lint:
   image: python:3.12
   script:
     - pip install flake8
-    - flake8 *.py --format=html --htmldir=flake8-report || true
+    - flake8 . --format=html --htmldir=flake8-report || true
   artifacts:
     when: always
     paths:
