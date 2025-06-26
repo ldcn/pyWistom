@@ -1,5 +1,6 @@
 import socket
 import struct
+import ssl
 
 from wistomconfig import (
     HOST,
@@ -27,7 +28,7 @@ from wistomtags import (
 )
 
 from wistomconnection import WistomConnection
-import ssl
+
 
 MAX_TAGS = 255
 
