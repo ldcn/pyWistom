@@ -3,11 +3,51 @@
 <head>
     <title>pyWistom Web Interface</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result, #peakResult {
+            margin: 20px 0;
+        }
+        #plot {
+            text-align: center;
+            margin: 20px 0;
+        }
+        #plot img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
     <h1>pyWistom Spectrum Viewer</h1>
     <button id="getSpectrum">Get Spectrum Data</button>
+    <button id="getPeaks">Show Number of Peaks</button>
     <div id="result"></div>
+    <div id="peakResult"></div>
     <div id="plot"></div>
     
     <script>
@@ -18,6 +58,23 @@
                     $('#plot').html('<img src="data:image/png;base64,' + data.plot + '" alt="Spectrum Plot">');
                 } else {
                     $('#result').html('<p>Error: ' + data.error + '</p>');
+                }
+            });
+        });
+        
+        $('#getPeaks').click(function() {
+            $.get('/peaks', function(data) {
+                if (data.success) {
+                    $('#peakResult').html(
+                        '<div style="background-color: #f0f8ff; padding: 10px; border-radius: 5px; margin: 10px 0;">' +
+                        '<h3>Peak Analysis Results</h3>' +
+                        '<p><strong>Number of peaks found:</strong> ' + data.peak_count + '</p>' +
+                        '<p><strong>Detection threshold:</strong> ' + data.threshold.toFixed(2) + '</p>' +
+                        '<p><strong>Peak positions:</strong> ' + data.peaks.join(', ') + '</p>' +
+                        '</div>'
+                    );
+                } else {
+                    $('#peakResult').html('<p style="color: red;">Error: ' + data.error + '</p>');
                 }
             });
         });
