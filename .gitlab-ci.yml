@@ -42,6 +42,13 @@ test:
         echo "No tests found, skipping unittest."
       fi
 
+flask-test:
+  stage: test
+  image: python:3.12
+  script:
+    - pip install -r requirements.txt
+    - python -c "from app import app; print('Flask app imports successfully')"
+
 build:
   stage: build
   image: python:3.12

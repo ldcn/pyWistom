@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>pyWistom Web Interface</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>pyWistom Spectrum Viewer</h1>
+    <button id="getSpectrum">Get Spectrum Data</button>
+    <div id="result"></div>
+    <div id="plot"></div>
+    
+    <script>
+        $('#getSpectrum').click(function() {
+            $.get('/spectrum', function(data) {
+                if (data.success) {
+                    $('#result').html('<p>Data preview: ' + data.data.join(', ') + '...</p>');
+                    $('#plot').html('<img src="data:image/png;base64,' + data.plot + '" alt="Spectrum Plot">');
+                } else {
+                    $('#result').html('<p>Error: ' + data.error + '</p>');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

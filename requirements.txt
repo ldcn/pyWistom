@@ -1,3 +1,6 @@
 # Core requirements for pyWistom
 flake8
 sphinx
+flask
+matplotlib
+numpy
