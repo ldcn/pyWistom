@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Information - pyWistom Web Interface</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nav a {
+            color: #4CAF50;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button.secondary {
+            background-color: #2196F3;
+        }
+        button.secondary:hover {
+            background-color: #1976D2;
+        }
+        .info-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .info-item {
+            margin: 10px 0;
+            padding: 8px;
+            border-left: 4px solid #4CAF50;
+            background-color: #f9f9f9;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #333;
+        }
+        .info-value {
+            color: #666;
+            margin-left: 10px;
+        }
+        .error {
+            color: red;
+            background-color: #ffe6e6;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid red;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        .raw-data {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .section-title {
+            color: #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+        .function-category {
+            margin: 20px 0;
+        }
+        .function-category h3 {
+            color: #2c5aa0;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>System Information & Management</h1>
+    
+    <div class="nav">
+        <a href="/">← Back to Spectrum Viewer</a>
+    </div>
+    
+    <div class="function-category">
+        <h3>System Manager Functions</h3>
+        <div class="button-grid">
+            <button id="getSmgrInfo">System Info</button>
+            <button id="getNetworkInfo">Network Info</button>
+            <button id="getSerialSettings">Serial Settings</button>
+            <button id="getSystemTime">System Time</button>
+            <button id="getTemperature">Temperature</button>
+            <button id="getUptime">System Uptime</button>
+        </div>
+    </div>
+    
+    <div class="function-category">
+        <h3>SNMP Functions</h3>
+        <div class="button-grid">
+            <button id="getSnmpPort">SNMP Agent Port</button>
+            <button id="getSnmpTraps">SNMP Trap Receivers</button>
+        </div>
+    </div>
+    
+    <div class="function-category">
+        <h3>Data Display Options</h3>
+        <div class="button-grid">
+            <button id="toggleRawData" class="secondary">Show/Hide Raw Data</button>
+            <button id="clearResults" class="secondary">Clear Results</button>
+        </div>
+    </div>
+    
+    <div id="result"></div>
+    <div id="rawData" class="raw-data" style="display: none;"></div>
+    
+    <script>
+        let rawDataVisible = false;
+        let currentData = null;
+        let timeUpdateInterval = null;
+        let isTimeDisplayActive = false;
+        
+        // SMGR API Functions
+        $('#getSmgrInfo').click(function() {
+            stopTimeUpdates();
+            fetchData('/smgr_info', 'System Manager Information');
+        });
+        
+        $('#getNetworkInfo').click(function() {
+            stopTimeUpdates();
+            fetchData('/smgr_network_info', 'Network Configuration');
+        });
+        
+        $('#getSerialSettings').click(function() {
+            stopTimeUpdates();
+            fetchData('/smgr_serial_settings', 'Serial Port Settings');
+        });
+        
+        $('#getSystemTime').click(function() {
+            startTimeUpdates();
+        });
+        
+        $('#getTemperature').click(function() {
+            stopTimeUpdates();
+            fetchData('/smgr_temp', 'System Temperature');
+        });
+        
+        $('#getUptime').click(function() {
+            stopTimeUpdates();
+            fetchData('/smgr_uptime', 'System Uptime');
+        });
+        
+        // SNMP Functions
+        $('#getSnmpPort').click(function() {
+            stopTimeUpdates();
+            fetchData('/snmp_agent_port', 'SNMP Agent Configuration');
+        });
+        
+        $('#getSnmpTraps').click(function() {
+            stopTimeUpdates();
+            fetchData('/snmp_trap_receivers', 'SNMP Trap Receivers');
+        });
+        
+        // Utility functions
+        $('#toggleRawData').click(function() {
+            if (currentData) {
+                rawDataVisible = !rawDataVisible;
+                $('#rawData').toggle();
+                $(this).text(rawDataVisible ? 'Hide Raw Data' : 'Show Raw Data');
+            }
+        });
+        
+        $('#clearResults').click(function() {
+            stopTimeUpdates();
+            $('#result').empty();
+            $('#rawData').empty().hide();
+            currentData = null;
+            rawDataVisible = false;
+            $('#toggleRawData').text('Show Raw Data');
+        });
+        
+        function startTimeUpdates() {
+            isTimeDisplayActive = true;
+            fetchTimeData(); // Initial fetch
+            
+            // Update every second
+            timeUpdateInterval = setInterval(function() {
+                if (isTimeDisplayActive) {
+                    fetchTimeData();
+                }
+            }, 1000);
+        }
+        
+        function stopTimeUpdates() {
+            isTimeDisplayActive = false;
+            if (timeUpdateInterval) {
+                clearInterval(timeUpdateInterval);
+                timeUpdateInterval = null;
+            }
+        }
+        
+        function fetchTimeData() {
+            $.get('/smgr_time', function(data) {
+                if (data.success && isTimeDisplayActive) {
+                    currentData = data.data;
+                    displayTimeInfo(data.data);
+                    if (rawDataVisible) {
+                        $('#rawData').html('<pre>' + JSON.stringify(data.data, null, 2) + '</pre>');
+                    }
+                } else if (!data.success) {
+                    $('#result').html('<div class="error">Error: ' + data.error + '</div>');
+                    stopTimeUpdates();
+                }
+            }).fail(function(xhr, status, error) {
+                $('#result').html('<div class="error">Failed to connect to the server: ' + error + '</div>');
+                stopTimeUpdates();
+            });
+        }
+        
+        function displayTimeInfo(data) {
+            let html = '<div class="info-container">';
+            html += '<h2 class="section-title">System Date & Time <span style="color: #28a745; font-size: 14px;">(Auto-updating)</span></h2>';
+            
+            // Handle different possible data structures
+            let timeData = data;
+            if (data && data.response) {
+                timeData = data.response;
+            }
+            
+            // Debug: show what we received
+            console.log('Time data received:', timeData);
+            
+            // Special handling for SMGR time response with separate date/time components
+            if (timeData && hasTimeComponents(timeData)) {
+                html += '<div class="info-item" style="background-color: #e8f5e8; border-left: 4px solid #28a745;">';
+                html += '<span class="info-label">Current System Time:</span>';
+                html += '<span class="info-value" style="font-size: 16px; font-weight: bold; color: #155724;">' + formatTimeComponents(timeData) + '</span>';
+                html += '</div>';
+                
+                // Add last updated indicator
+                html += '<div class="info-item" style="background-color: #f8f9fa; border-left: 4px solid #6c757d;">';
+                html += '<span class="info-label">Last Updated:</span>';
+                html += '<span class="info-value">' + new Date().toLocaleString() + '</span>';
+                html += '</div>';
+                
+                // Still show individual components in a compact format
+                html += '<div class="info-item">';
+                html += '<span class="info-label">Components:</span>';
+                html += '<span class="info-value">';
+                html += 'Year: ' + (timeData.year || 'N/A') + ' | ';
+                html += 'Month: ' + (timeData.month || 'N/A') + ' | ';
+                html += 'Day: ' + (timeData.day || 'N/A') + ' | ';
+                html += 'Hour: ' + (timeData.hour || 'N/A') + ' | ';
+                html += 'Minute: ' + (timeData.minute || 'N/A') + ' | ';
+                html += 'Second: ' + (timeData.second || 'N/A');
+                html += '</span>';
+                html += '</div>';
+            } else {
+                // Fallback: try to display any time-related fields or all available data
+                html += '<div class="info-item">';
+                html += '<span class="info-label">Raw Time Response:</span>';
+                html += '<span class="info-value">' + JSON.stringify(timeData, null, 2) + '</span>';
+                html += '</div>';
+                
+                // Try common time field names
+                const timeFields = ['current_time', 'date_time', 'timestamp', 'time', 'datetime'];
+                let foundTimeField = false;
+                
+                for (let field of timeFields) {
+                    if (timeData && timeData[field] !== undefined) {
+                        html += '<div class="info-item">';
+                        html += '<span class="info-label">' + field.replace(/_/g, ' ').toUpperCase() + ':</span>';
+                        html += '<span class="info-value">' + formatDateTime(timeData[field]) + '</span>';
+                        html += '</div>';
+                        foundTimeField = true;
+                    }
+                }
+                
+                if (!foundTimeField && timeData) {
+                    // Show all available fields
+                    for (let key in timeData) {
+                        if (timeData.hasOwnProperty(key)) {
+                            html += '<div class="info-item">';
+                            html += '<span class="info-label">' + key.replace(/_/g, ' ').toUpperCase() + ':</span>';
+                            html += '<span class="info-value">' + JSON.stringify(timeData[key]) + '</span>';
+                            html += '</div>';
+                        }
+                    }
+                }
+            }
+            
+            // Add control buttons
+            html += '<div style="margin-top: 15px; text-align: center;">';
+            html += '<button onclick="stopTimeUpdates()" style="background-color: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 0 5px;">Stop Auto-Update</button>';
+            html += '<button onclick="startTimeUpdates()" style="background-color: #28a745; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 0 5px;">Restart Auto-Update</button>';
+            html += '</div>';
+            
+            html += '</div>';
+            $('#result').html(html);
+        }
+        
+        function fetchData(endpoint, title) {
+            $('#result').html('<div class="loading">Loading ' + title.toLowerCase() + '...</div>');
+            
+            $.get(endpoint, function(data) {
+                if (data.success) {
+                    currentData = data.data;
+                    displayInfo(data.data, title);
+                    $('#rawData').html('<pre>' + JSON.stringify(data.data, null, 2) + '</pre>');
+                } else {
+                    $('#result').html('<div class="error">Error: ' + data.error + '</div>');
+                }
+            }).fail(function() {
+                $('#result').html('<div class="error">Failed to connect to the server</div>');
+            });
+        }
+        
+        function displayInfo(data, title) {
+            let html = '<div class="info-container">';
+            html += '<h2 class="section-title">' + title + '</h2>';
+            
+            // Handle different possible data structures
+            if (data.response) {
+                data = data.response;
+            }
+            
+            // Use normal field mapping for non-time displays
+            const fieldMappings = {
+                'System Manager Information': [
+                    { key: 'bootstrap_revision', label: 'Bootstrap Revision' },
+                    { key: 'unit_serial', label: 'Unit Serial Number' },
+                    { key: 'firmware_revision', label: 'Firmware Revision' },
+                    { key: 'hardware_revision', label: 'Hardware Revision' },
+                    { key: 'end_calibration_frequency', label: 'End Calibration Frequency', format: (v) => (v / 1e9).toFixed(3) + ' GHz' },
+                    { key: 'start_calibration_frequency', label: 'Start Calibration Frequency', format: (v) => (v / 1e9).toFixed(3) + ' GHz' },
+                    { key: 'device_type', label: 'Device Type' },
+                    { key: 'product_name', label: 'Product Name' },
+                    { key: 'manufacturer', label: 'Manufacturer' }
+                ],
+                'Network Configuration': [
+                    { key: 'ip_address', label: 'IP Address' },
+                    { key: 'subnet_mask', label: 'Subnet Mask' },
+                    { key: 'gateway', label: 'Gateway' },
+                    { key: 'mac_address', label: 'MAC Address' },
+                    { key: 'dhcp_enabled', label: 'DHCP Enabled' },
+                    { key: 'dns_server', label: 'DNS Server' },
+                    { key: 'hostname', label: 'Hostname' }
+                ],
+                'Serial Port Settings': [
+                    { key: 'baud_rate', label: 'Baud Rate' },
+                    { key: 'data_bits', label: 'Data Bits' },
+                    { key: 'stop_bits', label: 'Stop Bits' },
+                    { key: 'parity', label: 'Parity' },
+                    { key: 'flow_control', label: 'Flow Control' },
+                    { key: 'port_number', label: 'Port Number' }
+                ],
+                'System Temperature': [
+                    { key: 'temperature', label: 'Temperature', format: (v) => v + ' °C' },
+                    { key: 'temperature_status', label: 'Temperature Status' },
+                    { key: 'warning_threshold', label: 'Warning Threshold', format: (v) => v + ' °C' },
+                    { key: 'critical_threshold', label: 'Critical Threshold', format: (v) => v + ' °C' }
+                ],
+                'System Uptime': [
+                    { key: 'uptime_seconds', label: 'Uptime (seconds)' },
+                    { key: 'uptime', label: 'Uptime', format: (v) => typeof v === 'number' ? formatUptime(v) : v },
+                    { key: 'uptime_formatted', label: 'Uptime Formatted' },
+                    { key: 'boot_time', label: 'Boot Time', format: (v) => formatDateTime(v) },
+                    { key: 'system_start_time', label: 'System Start Time', format: (v) => formatDateTime(v) }
+                ],
+                'SNMP Agent Configuration': [
+                    { key: 'port', label: 'SNMP Port' },
+                    { key: 'enabled', label: 'SNMP Enabled' },
+                    { key: 'community', label: 'Community String' },
+                    { key: 'version', label: 'SNMP Version' }
+                ],
+                'SNMP Trap Receivers': [
+                    { key: 'receivers', label: 'Trap Receivers', format: (v) => Array.isArray(v) ? v.join(', ') : v }
+                ]
+            };
+            
+            const fields = fieldMappings[title] || [];
+            let hasDisplayedFields = false;
+            
+            // Display mapped fields
+            fields.forEach(field => {
+                if (data[field.key] !== undefined && data[field.key] !== null) {
+                    html += '<div class="info-item">';
+                    html += '<span class="info-label">' + field.label + ':</span>';
+                    let value = data[field.key];
+                    if (field.format) {
+                        value = field.format(value);
+                    }
+                    html += '<span class="info-value">' + value + '</span>';
+                    html += '</div>';
+                    hasDisplayedFields = true;
+                }
+            });
+            
+            // If no mapped fields found, display all available data
+            if (!hasDisplayedFields) {
+                html += '<h3 class="section-title">Available Data</h3>';
+                for (let key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        html += '<div class="info-item">';
+                        html += '<span class="info-label">' + key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) + ':</span>';
+                        html += '<span class="info-value">' + JSON.stringify(data[key]) + '</span>';
+                        html += '</div>';
+                    }
+                }
+            }
+            
+            html += '</div>';
+            $('#result').html(html);
+        }
+        
+        // Add the missing time-related functions
+        function hasTimeComponents(data) {
+            if (!data) return false;
+            return data.hasOwnProperty('year') && data.hasOwnProperty('month') && 
+                   data.hasOwnProperty('day') && data.hasOwnProperty('hour') && 
+                   data.hasOwnProperty('minute') && data.hasOwnProperty('second');
+        }
+        
+        function isTimeComponent(key) {
+            return ['year', 'month', 'day', 'hour', 'minute', 'second'].includes(key);
+        }
+        
+        function formatTimeComponents(data) {
+            if (!data || typeof data !== 'object') {
+                return 'Invalid time data';
+            }
+            
+            if (hasTimeComponents(data)) {
+                // Extract components, handling both number and string values
+                const year = parseInt(data.year) || 0;
+                const month = parseInt(data.month) || 1;
+                const day = parseInt(data.day) || 1;
+                const hour = parseInt(data.hour) || 0;
+                const minute = parseInt(data.minute) || 0;
+                const second = parseInt(data.second) || 0;
+                
+                // Validate components
+                if (year < 1970 || year > 3000 || month < 1 || month > 12 || 
+                    day < 1 || day > 31 || hour < 0 || hour > 23 || 
+                    minute < 0 || minute > 59 || second < 0 || second > 59) {
+                    return `Invalid time components: ${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`;
+                }
+                
+                // Create Date object (month is 0-indexed in JavaScript Date)
+                const date = new Date(year, month - 1, day, hour, minute, second);
+                
+                // Format in ISO 8601 standard with local time representation
+                const isoString = year + '-' + 
+                                month.toString().padStart(2, '0') + '-' + 
+                                day.toString().padStart(2, '0') + ' ' + 
+                                hour.toString().padStart(2, '0') + ':' + 
+                                minute.toString().padStart(2, '0') + ':' + 
+                                second.toString().padStart(2, '0');
+                
+                return isoString + ' (' + date.toLocaleString() + ')';
+            }
+            
+            return formatDateTime(data);
+        }
+        
+        function formatDateTime(value) {
+            if (!value) return 'Unknown';
+            
+            let date;
+            
+            // Handle different input formats
+            if (typeof value === 'number') {
+                // Assume Unix timestamp (seconds or milliseconds)
+                if (value > 1e10) {
+                    // Milliseconds
+                    date = new Date(value);
+                } else {
+                    // Seconds
+                    date = new Date(value * 1000);
+                }
+            } else if (typeof value === 'string') {
+                // Try to parse as ISO string or other formats
+                date = new Date(value);
+            } else if (value instanceof Date) {
+                date = value;
+            } else {
+                return 'Invalid date format: ' + JSON.stringify(value);
+            }
+            
+            // Check if date is valid
+            if (isNaN(date.getTime())) {
+                return 'Invalid date: ' + JSON.stringify(value);
+            }
+            
+            // Return ISO 8601 format with timezone
+            return date.toISOString().replace('T', ' ').replace('.000Z', ' UTC') + 
+                   ' (' + date.toLocaleString() + ')';
+        }
+        
+        function formatUptime(seconds) {
+            if (!seconds) return 'Unknown';
+            
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            let result = '';
+            if (days > 0) result += days + ' days, ';
+            if (hours > 0) result += hours + ' hours, ';
+            if (minutes > 0) result += minutes + ' minutes, ';
+            result += secs + ' seconds';
+            
+            return result;
+        }
+        
+        // Clean up intervals when page is unloaded
+        $(window).on('beforeunload', function() {
+            stopTimeUpdates();
+        });
+        
+        // Auto-load system info when page loads
+        $(document).ready(function() {
+            $('#getSmgrInfo').click();
+        });
+    </script>
+</body>
+</html>

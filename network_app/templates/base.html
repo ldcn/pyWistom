@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Wistom Network Info{% endblock %}</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🌐 Wistom Network Information</h1>
+            <p class="subtitle">Real-time network configuration monitoring</p>
+        </div>
+    </header>
+    
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Wistom Network Monitor | 
+            <span id="connection-status">Disconnected</span> | 
+            <span id="last-update">Never</span></p>
+        </div>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -40,12 +40,37 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+        .nav a {
+            color: #4CAF50;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <h1>pyWistom Spectrum Viewer</h1>
+    
+    <div class="nav" style="text-align: center; margin-bottom: 20px;">
+        <a href="/smgr" style="color: #4CAF50; text-decoration: none; margin: 0 10px; font-weight: bold;">System Information →</a>
+    </div>
+    
     <button id="getSpectrum">Get Spectrum Data</button>
-    <button id="getPeaks">Show Number of Peaks</button>
+    <button id="getPeaks">Show Number of Peaks (Auto)</button>
+    
+    <div style="margin: 15px 0; padding: 10px; background-color: #f9f9f9; border-radius: 4px;">
+        <label for="thresholdMethod" style="font-weight: bold;">Threshold Method:</label>
+        <select id="thresholdMethod" style="margin-left: 10px; padding: 5px;">
+            <option value="auto">Auto (Port threshold if available, otherwise calculated)</option>
+            <option value="port_threshold">Port Threshold Only</option>
+            <option value="calculated">Calculated (Peak Height Ref + Filter Constant)</option>
+        </select>
+        <button id="getPeaksWithMethod" style="margin-left: 10px;">Show Peaks with Selected Method</button>
+    </div>
+    
     <div id="result"></div>
     <div id="peakResult"></div>
     <div id="plot"></div>
@@ -62,20 +87,105 @@
             });
         });
         
+        $('#getPeaksWithMethod').click(function() {
+            const method = $('#thresholdMethod').val();
+            $.get('/peaks/' + method, function(data) {
+                displayPeakResults(data);
+            });
+        });
+        
+        function displayPeakResults(data) {
+            if (data.success) {
+                let html = '<div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px; margin: 10px 0;">';
+                html += '<h3 style="color: #2c5aa0; margin-top: 0;">Peak Analysis Results (Hardware Parameters-based)</h3>';
+                
+                // Threshold method info
+                if (data.threshold_method) {
+                    html += '<div style="background-color: #fff3cd; padding: 8px; border-radius: 4px; margin-bottom: 10px; border-left: 4px solid #ffc107;">';
+                    html += '<strong>Threshold Method:</strong> ' + data.threshold_method.replace('_', ' ').toUpperCase();
+                    html += '</div>';
+                }
+                
+                // Hardware parameters section
+                if (data.hardware_params) {
+                    html += '<div style="background-color: #e8f5e8; padding: 10px; border-radius: 4px; margin-bottom: 15px;">';
+                    html += '<h4 style="color: #2d5016; margin-top: 0;">Hardware Parameters Used:</h4>';
+                    html += '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; font-size: 11px;">';
+                    
+                    const params = data.hardware_params;
+                    html += '<div><strong>Peak Height Ref:</strong> ' + params.peak_height_reference_lines + '</div>';
+                    html += '<div><strong>Frequency Delta:</strong> ' + params.frequency_delta + '</div>';
+                    html += '<div><strong>Filter Constant:</strong> ' + params.filter_constant + '</div>';
+                    html += '<div><strong>White Light Min:</strong> ' + params.white_light_minimum + '</div>';
+                    html += '<div><strong>Min Peak Distance:</strong> ' + params.min_peak_distance + '</div>';
+                    html += '<div><strong>Min FWHM:</strong> ' + params.min_fwhm + '</div>';
+                    
+                    // Show both thresholds for comparison
+                    html += '<div><strong>Port Threshold:</strong> ' + (params.port_threshold !== null ? params.port_threshold.toFixed(2) : 'N/A') + '</div>';
+                    html += '<div><strong>Calculated Threshold:</strong> ' + params.calculated_threshold.toFixed(2) + '</div>';
+                    html += '<div style="grid-column: span 1;"><strong>Used Threshold:</strong> <span style="color: #d63384; font-weight: bold;">' + params.used_threshold.toFixed(2) + ' (' + params.threshold_source + ')</span></div>';
+                    
+                    html += '</div>';
+                    html += '</div>';
+                }
+                
+                html += '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">';
+                
+                // Summary information
+                html += '<div>';
+                html += '<p><strong>Number of peaks found:</strong> ' + data.peak_count + '</p>';
+                html += '<p><strong>Detection threshold:</strong> ' + data.threshold.toFixed(2) + '</p>';
+                html += '</div>';
+                
+                html += '<div>';
+                html += '<p><strong>Peak positions:</strong> ' + data.peaks.join(', ') + '</p>';
+                html += '</div>';
+                
+                html += '</div>';
+                
+                // Detailed peak information
+                if (data.peak_details && data.peak_details.length > 0) {
+                    html += '<h4 style="color: #2c5aa0;">Peak Details:</h4>';
+                    html += '<div style="overflow-x: auto;">';
+                    html += '<table style="width: 100%; border-collapse: collapse; font-size: 12px;">';
+                    html += '<thead>';
+                    html += '<tr style="background-color: #4CAF50; color: white;">';
+                    html += '<th style="padding: 8px; border: 1px solid #ddd;">Position</th>';
+                    html += '<th style="padding: 8px; border: 1px solid #ddd;">Height</th>';
+                    html += '<th style="padding: 8px; border: 1px solid #ddd;">FWHM</th>';
+                    html += '<th style="padding: 8px; border: 1px solid #ddd;">Prominence</th>';
+                    html += '<th style="padding: 8px; border: 1px solid #ddd;">SNR</th>';
+                    html += '<th style="padding: 8px; border: 1px solid #ddd;">Range</th>';
+                    html += '</tr>';
+                    html += '</thead>';
+                    html += '<tbody>';
+                    
+                    data.peak_details.forEach(function(peak, index) {
+                        html += '<tr style="' + (index % 2 === 0 ? 'background-color: #f9f9f9;' : '') + '">';
+                        html += '<td style="padding: 6px; border: 1px solid #ddd; text-align: center;">' + peak.position + '</td>';
+                        html += '<td style="padding: 6px; border: 1px solid #ddd; text-align: center;">' + peak.height.toFixed(2) + '</td>';
+                        html += '<td style="padding: 6px; border: 1px solid #ddd; text-align: center;">' + peak.fwhm + '</td>';
+                        html += '<td style="padding: 6px; border: 1px solid #ddd; text-align: center;">' + peak.prominence.toFixed(2) + '</td>';
+                        html += '<td style="padding: 6px; border: 1px solid #ddd; text-align: center;">' + peak.snr.toFixed(2) + '</td>';
+                        html += '<td style="padding: 6px; border: 1px solid #ddd; text-align: center;">' + peak.left_half_max + '-' + peak.right_half_max + '</td>';
+                        html += '</tr>';
+                    });
+                    
+                    html += '</tbody>';
+                    html += '</table>';
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                $('#peakResult').html(html);
+            } else {
+                $('#peakResult').html('<p style="color: red;">Error: ' + data.error + '</p>');
+            }
+        }
+        
         $('#getPeaks').click(function() {
             $.get('/peaks', function(data) {
-                if (data.success) {
-                    $('#peakResult').html(
-                        '<div style="background-color: #f0f8ff; padding: 10px; border-radius: 5px; margin: 10px 0;">' +
-                        '<h3>Peak Analysis Results</h3>' +
-                        '<p><strong>Number of peaks found:</strong> ' + data.peak_count + '</p>' +
-                        '<p><strong>Detection threshold:</strong> ' + data.threshold.toFixed(2) + '</p>' +
-                        '<p><strong>Peak positions:</strong> ' + data.peaks.join(', ') + '</p>' +
-                        '</div>'
-                    );
-                } else {
-                    $('#peakResult').html('<p style="color: red;">Error: ' + data.error + '</p>');
-                }
+                displayPeakResults(data);
             });
         });
     </script>
