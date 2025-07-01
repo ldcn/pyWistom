@@ -141,6 +141,182 @@ class WistomClient:
             b''
         )
 
+    # Set requests
+
+    def set_smgr_network_config(self, ip_address=None, subnet_mask=None, gateway=None, hostname=None, mac_address=None, tcp_port=None):
+        """
+        Set network configuration parameters.
+
+        Args:
+            ip_address (str, optional): IP address (e.g., "192.168.1.100")
+            subnet_mask (str, optional): Subnet mask (e.g., "255.255.255.0")
+            gateway (str, optional): Gateway address (e.g., "192.168.1.1")
+            hostname (str, optional): Device hostname
+            mac_address (str, optional): MAC address (e.g., "00:11:22:33:44:55")
+            tcp_port (int, optional): TCP port number (e.g., 443)
+
+        Returns:
+            dict: Response from the device for each parameter set
+
+        Raises:
+            ValueError: If invalid parameters are provided
+            Exception: If the request fails
+        """
+        import struct
+        results = {}
+
+        # Tag definitions
+        TAG_IP_ADDRESS = 1
+        TAG_SUBNET_MASK = 2
+        TAG_GATEWAY = 3
+        TAG_HOSTNAME = 4
+        TAG_MAC_ADDRESS = 5
+        TAG_TCP_PORT = 6
+
+        # Validate and set IP address
+        if ip_address is not None:
+            if not self._validate_ip_address(ip_address):
+                raise ValueError(f"Invalid IP address format: {ip_address}")
+
+            self.__increment_token()
+            data = struct.pack('B', TAG_IP_ADDRESS) + \
+                ip_address.encode('utf-8')
+            response = self.__send_request(
+                COMMAND_ID['SET'],
+                b'SMGR',
+                b'IP##',
+                data
+            )
+            results['ip_address'] = response
+
+        # Validate and set subnet mask
+        if subnet_mask is not None:
+            if not self._validate_ip_address(subnet_mask):
+                raise ValueError(f"Invalid subnet mask format: {subnet_mask}")
+
+            self.__increment_token()
+            data = struct.pack('B', TAG_SUBNET_MASK) + \
+                subnet_mask.encode('utf-8')
+            response = self.__send_request(
+                COMMAND_ID['SET'],
+                b'SMGR',
+                b'IP##',
+                data
+            )
+            results['subnet_mask'] = response
+
+        # Validate and set gateway
+        if gateway is not None:
+            if not self._validate_ip_address(gateway):
+                raise ValueError(f"Invalid gateway address format: {gateway}")
+
+            self.__increment_token()
+            data = struct.pack('B', TAG_GATEWAY) + gateway.encode('utf-8')
+            response = self.__send_request(
+                COMMAND_ID['SET'],
+                b'SMGR',
+                b'IP##',
+                data
+            )
+            results['gateway'] = response
+
+        # Validate and set hostname
+        if hostname is not None:
+            if not isinstance(hostname, str) or len(hostname) == 0 or len(hostname) > 255:
+                raise ValueError(f"Invalid hostname: must be 1-255 characters")
+
+            self.__increment_token()
+            data = struct.pack('B', TAG_HOSTNAME) + hostname.encode('utf-8')
+            response = self.__send_request(
+                COMMAND_ID['SET'],
+                b'SMGR',
+                b'IP##',
+                data
+            )
+            results['hostname'] = response
+
+        # Validate and set MAC address
+        if mac_address is not None:
+            if not self._validate_mac_address(mac_address):
+                raise ValueError(f"Invalid MAC address format: {mac_address}")
+
+            self.__increment_token()
+            data = struct.pack('B', TAG_MAC_ADDRESS) + \
+                mac_address.encode('utf-8')
+            response = self.__send_request(
+                COMMAND_ID['SET'],
+                b'SMGR',
+                b'IP##',
+                data
+            )
+            results['mac_address'] = response
+
+        # Validate and set TCP port
+        if tcp_port is not None:
+            if not isinstance(tcp_port, int) or tcp_port < 1 or tcp_port > 65535:
+                raise ValueError(
+                    f"Invalid TCP port: must be 1-65535, got {tcp_port}")
+
+            self.__increment_token()
+            data = struct.pack('B', TAG_TCP_PORT) + \
+                struct.pack('>H', tcp_port)  # Big-endian uint16
+            response = self.__send_request(
+                COMMAND_ID['SET'],
+                b'SMGR',
+                b'IP##',
+                data
+            )
+            results['tcp_port'] = response
+
+        return results
+
+    def _validate_ip_address(self, ip):
+        """Validate IP address format."""
+        try:
+            parts = ip.split('.')
+            if len(parts) != 4:
+                return False
+            for part in parts:
+                if not (0 <= int(part) <= 255):
+                    return False
+            return True
+        except (ValueError, AttributeError):
+            return False
+
+    def _validate_mac_address(self, mac):
+        """Validate MAC address format."""
+        import re
+        # Accept formats: XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX
+        pattern = r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
+        return re.match(pattern, mac) is not None
+
+    # Individual setter functions for convenience
+    def set_ip_address(self, ip_address):
+        """Set only the IP address."""
+        return self.set_smgr_network_config(ip_address=ip_address)
+
+    def set_subnet_mask(self, subnet_mask):
+        """Set only the subnet mask."""
+        return self.set_smgr_network_config(subnet_mask=subnet_mask)
+
+    def set_gateway(self, gateway):
+        """Set only the gateway."""
+        return self.set_smgr_network_config(gateway=gateway)
+
+    def set_hostname(self, hostname):
+        """Set only the hostname."""
+        return self.set_smgr_network_config(hostname=hostname)
+
+    def set_mac_address(self, mac_address):
+        """Set only the MAC address."""
+        return self.set_smgr_network_config(mac_address=mac_address)
+
+    def set_tcp_port(self, tcp_port):
+        """Set only the TCP port."""
+        return self.set_smgr_network_config(tcp_port=tcp_port)
+
+    # Custom API request functions
+
     def custom_api_request(self, command_id, app_id, op_id, data):
         self.__increment_token()
         return self.__send_request(

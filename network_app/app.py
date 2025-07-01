@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 import sys
 import os
 
@@ -72,6 +72,76 @@ def get_system_info():
             'success': False,
             'error': str(e)
         })
+
+
+@app.route('/api/set_network_config', methods=['POST'])
+def set_network_config():
+    try:
+        data = request.get_json()
+
+        with pyWistom.WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
+            login_response = client.login()
+
+            # Extract parameters from request
+            params = {}
+            if 'ip_address' in data:
+                params['ip_address'] = data['ip_address']
+            if 'subnet_mask' in data:
+                params['subnet_mask'] = data['subnet_mask']
+            if 'gateway' in data:
+                params['gateway'] = data['gateway']
+            if 'hostname' in data:
+                params['hostname'] = data['hostname']
+            if 'mac_address' in data:
+                params['mac_address'] = data['mac_address']
+            if 'tcp_port' in data:
+                params['tcp_port'] = int(data['tcp_port'])
+
+            # Set the network configuration
+            results = client.set_smgr_network_config(**params)
+
+            return jsonify({
+                'success': True,
+                'message': 'Network configuration updated successfully',
+                'results': results
+            })
+
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'error': f'Validation error: {str(e)}'
+        }), 400
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/set_ip', methods=['POST'])
+def set_ip_address():
+    try:
+        data = request.get_json()
+        ip_address = data.get('ip_address')
+
+        if not ip_address:
+            return jsonify({'success': False, 'error': 'IP address required'}), 400
+
+        with pyWistom.WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
+            login_response = client.login()
+            result = client.set_ip_address(ip_address)
+
+            return jsonify({
+                'success': True,
+                'message': f'IP address set to {ip_address}',
+                'result': result
+            })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 
 if __name__ == '__main__':

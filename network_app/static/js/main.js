@@ -60,10 +60,10 @@ const Utils = {
         
         $('body').append(notification);
         
-        // Auto-hide after 3 seconds
+        // Auto-hide after 4 seconds
         setTimeout(() => {
             notification.fadeOut(() => notification.remove());
-        }, 3000);
+        }, 4000);
         
         // Manual close
         notification.find('.notification-close').click(() => {
