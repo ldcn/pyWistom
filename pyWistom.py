@@ -180,7 +180,7 @@ class WistomClient:
 
             self.__increment_token()
             data = struct.pack('B', TAG_IP_ADDRESS) + \
-                ip_address.encode('utf-8')
+                ip_address.encode('ascii') + b'\x00'
             response = self.__send_request(
                 COMMAND_ID['SET'],
                 b'SMGR',
@@ -196,7 +196,7 @@ class WistomClient:
 
             self.__increment_token()
             data = struct.pack('B', TAG_SUBNET_MASK) + \
-                subnet_mask.encode('utf-8')
+                subnet_mask.encode('ascii') + b'\x00'
             response = self.__send_request(
                 COMMAND_ID['SET'],
                 b'SMGR',
@@ -211,7 +211,8 @@ class WistomClient:
                 raise ValueError(f"Invalid gateway address format: {gateway}")
 
             self.__increment_token()
-            data = struct.pack('B', TAG_GATEWAY) + gateway.encode('utf-8')
+            data = struct.pack('B', TAG_GATEWAY) + \
+                gateway.encode('ascii') + b'\x00'
             response = self.__send_request(
                 COMMAND_ID['SET'],
                 b'SMGR',
@@ -226,7 +227,8 @@ class WistomClient:
                 raise ValueError(f"Invalid hostname: must be 1-255 characters")
 
             self.__increment_token()
-            data = struct.pack('B', TAG_HOSTNAME) + hostname.encode('utf-8')
+            data = struct.pack('B', TAG_HOSTNAME) + \
+                hostname.encode('ascii') + b'\x00'
             response = self.__send_request(
                 COMMAND_ID['SET'],
                 b'SMGR',
@@ -242,7 +244,7 @@ class WistomClient:
 
             self.__increment_token()
             data = struct.pack('B', TAG_MAC_ADDRESS) + \
-                mac_address.encode('utf-8')
+                mac_address.encode('ascii') + b'\x00'
             response = self.__send_request(
                 COMMAND_ID['SET'],
                 b'SMGR',
