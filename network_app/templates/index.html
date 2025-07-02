@@ -469,6 +469,66 @@
         });
     }
     
+    function flashROM() {
+        if (!confirm('Are you sure you want to flash the ROM? This will permanently save the current configuration.')) {
+            return;
+        }
+        
+        showStatusMessage('Flashing ROM...', 'info');
+        
+        fetch('/api/flash_rom', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showStatusMessage('ROM flashed successfully! Configuration saved permanently.', 'success');
+            } else {
+                showStatusMessage(`Flash ROM failed: ${data.error}`, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Flash ROM error:', error);
+            showStatusMessage('Flash ROM request failed', 'error');
+        });
+    }
+    
+    // Validate Configuration function
+    function validateNetworkConfiguration() {
+        const formData = getFormData();
+        
+        if (Object.keys(formData).length === 0) {
+            showValidationResults('Please fill in at least one field to validate', 'error');
+            return;
+        }
+
+        showStatusMessage('Validating configuration...', 'info');
+        
+        fetch('/api/validate_network_config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showValidationResults('Configuration is valid!', 'success');
+            } else {
+                showValidationResults(`Validation failed: ${data.error}`, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Validation error:', error);
+            showValidationResults('Validation request failed', 'error');
+        });
+    }
+
+
     function getFormData() {
         return {
             ip_address: $('#ip_address').val().trim(),
