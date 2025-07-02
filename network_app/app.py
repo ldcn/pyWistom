@@ -92,8 +92,6 @@ def set_network_config():
                 params['gateway'] = data['gateway']
             if 'hostname' in data:
                 params['hostname'] = data['hostname']
-            if 'mac_address' in data:
-                params['mac_address'] = data['mac_address']
             if 'tcp_port' in data:
                 params['tcp_port'] = int(data['tcp_port'])
 
