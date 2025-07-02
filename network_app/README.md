@@ -4,7 +4,7 @@ A dedicated Flask web application for monitoring and displaying Wistom device ne
 ## Features
 
 - **Real-time Network Monitoring**: Auto-refresh network information every 10 seconds
-- **Visual Status Indicators**: Color-coded status for connection, DHCP, and response times
+- **Visual Status Indicators**: Color-coded status for connection and response times
 - **Modern UI**: Responsive design with smooth animations and card-based layout
 - **Raw Data Access**: View raw API responses for debugging
 - **Mobile Friendly**: Responsive design works on all device sizes
@@ -22,7 +22,7 @@ A dedicated Flask web application for monitoring and displaying Wistom device ne
    Make sure your `wistomconfig.py` in the parent directory has the correct settings:
    ```python
    HOST = "your_wistom_device_ip"
-   PORT = 443
+   PORT = 7734
    USER_ID = "your_username"
    PASSWORD = "your_password"
    ```
@@ -67,7 +67,6 @@ A dedicated Flask web application for monitoring and displaying Wistom device ne
 
 ### Status Monitoring
 - **Connection Status**: Real-time connection health
-- **DHCP Status**: Dynamic IP configuration state
 - **Response Time**: API call latency
 - **Last Check**: Timestamp of last successful update
 
