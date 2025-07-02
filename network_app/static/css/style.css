@@ -121,6 +121,21 @@ header h1 {
     background: #00b3d7;
 }
 
+.btn-danger {
+    background: #e53e3e;
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #c53030;
+    transform: translateY(-2px);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+}
+
 .info-grid, .network-grid {
     display: grid;
     gap: 12px;
@@ -176,15 +191,16 @@ header h1 {
 }
 
 .status-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Reduced from 200px */
+    display: flex;
     gap: 15px;
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+    padding-bottom: 10px;
 }
 
-/* Alternative: For exactly 3 columns on larger screens */
+/* Alternative: Use specific column sizes for better control */
 @media (min-width: 768px) {
     .status-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, minmax(200px, 1fr)); /* Ensure minimum width */
     }
 }
 
@@ -195,6 +211,8 @@ header h1 {
 }
 
 .status-item {
+    flex: 1 0 180px; /* Flex-grow, flex-shrink, flex-basis */
+    min-width: 180px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -203,42 +221,46 @@ header h1 {
     border-radius: 10px;
     border: 2px solid transparent;
     transition: all 0.3s ease;
+    min-height: 60px; /* Ensure consistent height */
 }
 
 .status-label {
     font-weight: 600;
     color: #4a5568;
+    font-size: 13px; /* Slightly smaller font */
+    flex-shrink: 0;
+    margin-right: 8px;
+    white-space: nowrap; /* Prevent label wrapping */
 }
 
 .status-value {
+    font-family: 'Courier New', monospace;
     font-weight: 500;
-    padding: 4px 8px;
-    border-radius: 4px;
+    color: #2d3748;
+    text-align: right;
+    font-size: 13px; /* Match label size */
+    flex-shrink: 1;
 }
 
-.status-value.connected {
-    background: #c6f6d5;
-    color: #22543d;
-}
-
-.status-value.disconnected {
-    background: #fed7d7;
-    color: #742a2a;
-}
-
-.status-value.error {
-    background: #fbb6ce;
-    color: #702459;
-}
-
-.status-value.unknown {
-    background: #e2e8f0;
-    color: #4a5568;
-}
-
-.status-value.connecting {
-    background: #bee3f8;
-    color: #2c5282;
+/* For very small screens, stack vertically */
+@media (max-width: 480px) {
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .status-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 5px;
+    }
+    
+    .status-label {
+        margin-right: 0;
+    }
+    
+    .status-value {
+        text-align: center;
+    }
 }
 
 .raw-data {
