@@ -530,14 +530,32 @@
 
 
     function getFormData() {
-        return {
-            ip_address: $('#ip_address').val().trim(),
-            subnet_mask: $('#subnet_mask').val().trim(),
-            gateway: $('#gateway').val().trim(),
-            hostname: $('#hostname').val().trim(),
-            mac_address: $('#mac_address').val().trim(),
-            tcp_port: parseInt($('#tcp_port').val()) || null
-        };
+        const formData = new FormData(document.getElementById('network-config-form'));
+        const configData = {};
+        
+        // Convert FormData to object, only include non-empty values
+        for (let [key, value] of formData.entries()) {
+            if (value.trim()) {
+                configData[key] = value.trim();
+            }
+        }
+        
+        return configData;
+    }
+
+    // Helper function to reset form
+    function resetNetworkConfigForm() {
+        document.getElementById('network-config-form').reset();
+        $('#config-validation').hide();
+    }
+
+    // Helper function to show validation results
+    function showValidationResults(message, type) {
+        const validationDiv = $('#config-validation');
+        validationDiv.removeClass('success error info warning');
+        validationDiv.addClass(type);
+        validationDiv.html(`<p>${message}</p>`);
+        validationDiv.show();
     }
     
     function resetConfigForm() {
