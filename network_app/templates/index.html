@@ -131,6 +131,28 @@
         $('#validate-config').click(validateConfiguration);
         $('#reset-form').click(resetConfigForm);
         $('#network-config-form').submit(applyNetworkConfiguration);
+        
+        // Validate Configuration button handler
+        $('#validate-config').on('click', function() {
+            validateNetworkConfiguration();
+        });
+
+        // Apply Configuration form submission handler
+        $('#network-config-form').on('submit', function(e) {
+            e.preventDefault();
+            applyNetworkConfiguration();
+        });
+
+        // Apply Configuration button click handler (alternative)
+        $('#apply-config').on('click', function(e) {
+            e.preventDefault();
+            applyNetworkConfiguration();
+        });
+
+        // Reset Form button handler
+        $('#reset-form').on('click', function() {
+            resetNetworkConfigForm();
+        });
     });
     
     function loadSystemInfo() {
