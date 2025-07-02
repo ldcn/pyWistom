@@ -152,5 +152,69 @@ def set_ip_address():
         }), 500
 
 
+@app.route('/api/validate_network_config', methods=['POST'])
+def validate_network_config():
+    """Validate network configuration without applying it"""
+    try:
+        data = request.get_json()
+        errors = []
+
+        # Validate IP address
+        if 'ip_address' in data:
+            if not validate_ip_address(data['ip_address']):
+                errors.append('Invalid IP address format')
+
+        # Validate subnet mask
+        if 'subnet_mask' in data:
+            if not validate_ip_address(data['subnet_mask']):
+                errors.append('Invalid subnet mask format')
+
+        # Validate gateway
+        if 'gateway' in data:
+            if not validate_ip_address(data['gateway']):
+                errors.append('Invalid gateway address format')
+
+        # Validate hostname
+        if 'hostname' in data:
+            hostname = data['hostname']
+            if not (1 <= len(hostname) <= 255):
+                errors.append('Hostname must be 1-255 characters')
+            if not hostname.replace('-', '').replace('_', '').isalnum():
+                errors.append('Hostname contains invalid characters')
+
+        # Validate TCP port
+        if 'tcp_port' in data:
+            try:
+                port = int(data['tcp_port'])
+                if not (1 <= port <= 65535):
+                    errors.append('TCP port must be between 1 and 65535')
+            except (ValueError, TypeError):
+                errors.append('Invalid TCP port number')
+
+        if errors:
+            return jsonify({
+                'success': False,
+                'error': '; '.join(errors)
+            }), 400
+
+        return jsonify({
+            'success': True,
+            'message': 'Configuration is valid'
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+def validate_ip_address(ip):
+    """Validate IP address format"""
+    import re
+    pattern = r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+    return bool(re.match(pattern, ip))
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)
