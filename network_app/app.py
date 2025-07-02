@@ -98,10 +98,15 @@ def set_network_config():
             # Set the network configuration
             results = client.set_smgr_network_config(**params)
 
+            # Flash ROM to save changes permanently
+            flash_result = client.custom_api_request(
+                COMMAND_ID['SET'], b'SMGR', b'FLSH', b'\x01\x00')
+
             return jsonify({
                 'success': True,
-                'message': 'Network configuration updated successfully',
-                'results': results
+                'message': 'Network configuration updated and saved to ROM successfully',
+                'results': results,
+                'flash_result': flash_result
             })
 
     except ValueError as e:
@@ -129,10 +134,15 @@ def set_ip_address():
             login_response = client.login()
             result = client.set_ip_address(ip_address)
 
+            # Flash ROM to save changes permanently
+            flash_result = client.custom_api_request(
+                COMMAND_ID['SET'], b'SMGR', b'FLSH', b'\x01\x00')
+
             return jsonify({
                 'success': True,
-                'message': f'IP address set to {ip_address}',
-                'result': result
+                'message': f'IP address set to {ip_address} and saved to ROM',
+                'result': result,
+                'flash_result': flash_result
             })
 
     except Exception as e:
