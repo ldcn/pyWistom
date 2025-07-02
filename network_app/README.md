@@ -1,15 +1,14 @@
-# 🌐 Wistom Network Information Web App
-
+# Wistom Network Information Web App
 A dedicated Flask web application for monitoring and displaying Wistom device network configuration in real-time.
 
 ## Features
 
-- 🔄 **Real-time Network Monitoring**: Auto-refresh network information every 10 seconds
-- 📊 **Visual Status Indicators**: Color-coded status for connection, DHCP, and response times
-- 🎨 **Modern UI**: Responsive design with smooth animations and card-based layout
-- 🔍 **Raw Data Access**: View raw API responses for debugging
-- 📱 **Mobile Friendly**: Responsive design works on all device sizes
-- ⚡ **Fast Performance**: Lightweight and optimized for quick loading
+- **Real-time Network Monitoring**: Auto-refresh network information every 10 seconds
+- **Visual Status Indicators**: Color-coded status for connection, DHCP, and response times
+- **Modern UI**: Responsive design with smooth animations and card-based layout
+- **Raw Data Access**: View raw API responses for debugging
+- **Mobile Friendly**: Responsive design works on all device sizes
+- **Fast Performance**: Lightweight and optimized for quick loading
 
 ## Quick Start
 
@@ -46,18 +45,17 @@ A dedicated Flask web application for monitoring and displaying Wistom device ne
 ## Network Information Displayed
 
 ### High Priority
-- 🌐 **IP Address** - Current device IP
-- 🔒 **Subnet Mask** - Network mask
-- 🚪 **Gateway** - Default gateway
+- **IP Address** - Current device IP
+- **Subnet Mask** - Network mask
+- **Gateway** - Default gateway
 
 ### Medium Priority  
-- 🏷️ **MAC Address** - Hardware address
-- 📡 **DNS Server** - DNS configuration
-- 🖥️ **Hostname** - Device hostname
+- **MAC Address** - Hardware address
+- **DNS Server** - DNS configuration
+- **Hostname** - Device hostname
 
 ### Low Priority
-- ⚡ **DHCP Status** - Dynamic IP configuration
-- 🔌 **TCP Port** - Communication port
+- **TCP Port** - Communication port
 
 ## Features in Detail
 
