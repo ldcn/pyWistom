@@ -1,595 +1,381 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="dashboard">
-    <!-- System Info Card -->
-    <div class="card system-info">
-        <h2>System Information</h2>
-        <div id="system-info-content">
-            <div class="loading">Loading system information...</div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wistom Monitor</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>WISTOM Monitor</h1>
+            <p class="subtitle">Network Configuration</p>
         </div>
-    </div>
+    </header>
     
-    <!-- Network Configuration Card -->
-    <div class="card network-config">
-        <h2>Network Configuration</h2>
-        <div class="card-controls">
-            <button id="refresh-network" class="btn btn-primary">Refresh Network Info</button>
-            <button id="toggle-auto-refresh" class="btn btn-secondary">Auto Refresh: OFF</button>
-            <button id="show-raw-data" class="btn btn-info">Show Raw Data</button>
-            <button id="toggle-config-form" class="btn btn-warning">Configure Network</button>
-        </div>
-        <div id="network-info-content">
-            <div class="loading">Click "Refresh Network Info" to load data...</div>
-        </div>
-    </div>
-    
-    <!-- Network Configuration Form Card -->
-    <div id="network-config-card" class="card network-config-form" style="display: none;">
-        <h2>Network Configuration</h2>
-        <div class="card-controls">
-            <button id="hide-config-form" class="btn btn-secondary">Cancel</button>
-            <button id="load-current-config" class="btn btn-info">Load Current Config</button>
-        </div>
-        
-        <form id="network-config-form">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="ip_address">IP Address:</label>
-                    <input type="text" id="ip_address" name="ip_address" placeholder="10.44.40.100" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
-                    <small class="form-help">Enter a valid IPv4 address</small>
+    <main class="container">
+        <div class="dashboard">
+            <!-- Device Information Card -->
+            <div class="card">
+                <h2>Device Information</h2>
+                <div class="card-controls">
+                    <button id="refresh-network" class="btn btn-primary">Refresh</button>
                 </div>
                 
-                <div class="form-group">
-                    <label for="subnet_mask">Subnet Mask:</label>
-                    <input type="text" id="subnet_mask" name="subnet_mask" placeholder="255.255.255.0" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
-                    <small class="form-help">Enter subnet mask (e.g., 255.255.255.0)</small>
-                </div>
+                <h3>System Information</h3>
+                <div id="system-info-content" class="loading">Loading...</div>
                 
-                <div class="form-group">
-                    <label for="gateway">Gateway:</label>
-                    <input type="text" id="gateway" name="gateway" placeholder="10.44.40.1" pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$">
-                    <small class="form-help">Enter gateway IP address</small>
-                </div>
+                <h3>Network Configuration</h3>
+                <div id="network-info-content" class="loading">Loading...</div>
                 
-                <div class="form-group">
-                    <label for="hostname">Hostname:</label>
-                    <input type="text" id="hostname" name="hostname" placeholder="A20-00500" maxlength="255">
-                    <small class="form-help">Device hostname (1-255 characters)</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="tcp_port">TCP Port:</label>
-                    <input type="number" id="tcp_port" name="tcp_port" placeholder="7734" min="1" max="65535">
-                    <small class="form-help">Port number (1-65535)</small>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-label">Connection</span>
+                        <span id="connection-indicator" class="status-value">Unknown</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Last Check</span>
+                        <span id="last-check" class="status-value">Never</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Response</span>
+                        <span id="response-time" class="status-value">N/A</span>
+                    </div>
                 </div>
             </div>
             
-            <div class="form-actions">
-                <button type="button" id="validate-config" class="btn btn-info">Validate Configuration</button>
-                <button type="submit" id="apply-config" class="btn btn-success">Apply Configuration</button>
-                <button type="button" id="reset-form" class="btn btn-secondary">Reset Form</button>
-            </div>
-            
-            <div id="config-validation" class="validation-results" style="display: none;"></div>
-        </form>
-    </div>
-    
-    <!-- Network Status Card -->
-    <div class="card network-status">
-        <h2>Network Status</h2>
-        <div id="network-status-content">
-            <div class="status-grid">
-                <div class="status-item">
-                    <span class="status-label">Status:</span>
-                    <span id="connection-indicator" class="status-value connected">Connected</span>
+            <!-- Network Configuration Form Card -->
+            <div class="card">
+                <h2>Network Configuration</h2>
+                <div class="card-controls">
+                    <button id="load-current-config" class="btn btn-info">Load Current</button>
                 </div>
-                <div class="status-item">
-                    <span class="status-label">Last Check:</span>
-                    <span id="last-check" class="status-value">7:57:37 PM</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Ping:</span>
-                    <span id="response-time" class="status-value">537ms</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Raw Data Display -->
-    <div id="raw-data-card" class="card raw-data" style="display: none;">
-        <h2>Raw API Response</h2>
-        <div class="card-controls">
-            <button id="hide-raw-data" class="btn btn-secondary">Hide Raw Data</button>
-            <button id="copy-raw-data" class="btn btn-info">Copy to Clipboard</button>
-        </div>
-        <pre id="raw-data-content"></pre>
-    </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    let autoRefreshInterval = null;
-    let autoRefreshEnabled = false;
-    
-    $(document).ready(function() {
-        loadSystemInfo();
-        loadNetworkInfo();
-        
-        // Event handlers
-        $('#refresh-network').click(loadNetworkInfo);
-        $('#toggle-auto-refresh').click(toggleAutoRefresh);
-        $('#show-raw-data').click(showRawData);
-        $('#hide-raw-data').click(hideRawData);
-        $('#copy-raw-data').click(copyRawData);
-        
-        // Network configuration form handlers
-        $('#toggle-config-form').click(showConfigForm);
-        $('#hide-config-form').click(hideConfigForm);
-        $('#load-current-config').click(loadCurrentConfig);
-        $('#validate-config').click(validateConfiguration);
-        $('#reset-form').click(resetConfigForm);
-        $('#network-config-form').submit(applyNetworkConfiguration);
-        
-        // Validate Configuration button handler
-        $('#validate-config').on('click', function() {
-            validateNetworkConfiguration();
-        });
-
-        // Apply Configuration form submission handler
-        $('#network-config-form').on('submit', function(e) {
-            e.preventDefault();
-            applyNetworkConfiguration();
-        });
-
-        // Apply Configuration button click handler (alternative)
-        $('#apply-config').on('click', function(e) {
-            e.preventDefault();
-            applyNetworkConfiguration();
-        });
-
-        // Reset Form button handler
-        $('#reset-form').on('click', function() {
-            resetNetworkConfigForm();
-        });
-    });
-    
-    function loadSystemInfo() {
-        $.get('/api/system_info')
-            .done(function(data) {
-                if (data.success) {
-                    displaySystemInfo(data.data);
-                } else {
-                    $('#system-info-content').html('<div class="error">Error: ' + data.error + '</div>');
-                }
-            })
-            .fail(function() {
-                $('#system-info-content').html('<div class="error">Failed to connect to server</div>');
-            });
-    }
-    
-    function loadNetworkInfo() {
-        const startTime = Date.now();
-        updateConnectionStatus('connecting');
-        
-        $.get('/network_info')
-            .done(function(data) {
-                const responseTime = Date.now() - startTime;
-                $('#response-time').text(responseTime + 'ms');
                 
-                if (data.success) {
-                    displayNetworkInfo(data.data);
-                    updateConnectionStatus('connected');
-                    updateLastCheck();
-                } else {
-                    $('#network-info-content').html('<div class="error">Error: ' + data.error + '</div>');
-                    updateConnectionStatus('error');
-                }
-            })
-            .fail(function() {
-                $('#network-info-content').html('<div class="error">Failed to connect to server</div>');
-                updateConnectionStatus('disconnected');
-                $('#response-time').text('Timeout');
-            });
-    }
+                <form id="network-config-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="ip_address">IP Address:</label>
+                            <input type="text" id="ip_address" name="ip_address">
+                            <small class="form-help">IPv4 format</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subnet_mask">Subnet Mask:</label>
+                            <input type="text" id="subnet_mask" name="subnet_mask">
+                            <small class="form-help">Subnet mask</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="gateway">Gateway:</label>
+                            <input type="text" id="gateway" name="gateway">
+                            <small class="form-help">Gateway IP</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="hostname">Hostname:</label>
+                            <input type="text" id="hostname" name="hostname">
+                            <small class="form-help">Device name</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tcp_port">TCP Port:</label>
+                            <input type="number" id="tcp_port" name="tcp_port" min="1" max="65535">
+                            <small class="form-help">Port (1-65535, default: 7734)</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                    <!--
+                        <button type="button" id="validate-config" class="btn btn-info">Validate</button>
+                    -->
+                        <button type="button" id="apply-config" class="btn btn-success">Apply & Save</button>
+                        <button type="button" id="reset-form" class="btn btn-secondary">Reset</button>
+                    </div>
+                    
+                    <div id="config-validation" class="validation-results" style="display: none;"></div>
+                </form>
+            </div>
+        </div>
+    </main>
     
-    function displaySystemInfo(data) {
-        const response = data.response || data;
-        let html = '<div class="info-grid">';
+    <footer>
+        <div class="container">
+            <span id="connection-status">Disconnected</span> | 
+            <span id="last-update">Never updated</span>
+        </div>
+    </footer>
+    
+    <script>
+        $(document).ready(function() {
+            loadSystemInfo();
+            loadNetworkInfo();
+            
+            // Event handlers
+            $('#refresh-network').click(function() {
+                loadSystemInfo();
+                loadNetworkInfo();
+            });
+            
+            $('#load-current-config').click(loadCurrentConfig);
+            $('#validate-config').click(validateNetworkConfiguration);
+            $('#reset-form').click(resetNetworkConfigForm);
+            $('#apply-config').click(applyNetworkConfiguration);
+        });
         
-        const systemFields = [
-            { key: 'product_name', label: 'Product' },
-            { key: 'manufacturer', label: 'Manufacturer' },
-            { key: 'unit_serial', label: 'Serial Number' },
-            { key: 'firmware_revision', label: 'Firmware' },
+        function loadSystemInfo() {
+            $.get('/api/system_info')
+                .done(function(data) {
+                    if (data.success) {
+                        displaySystemInfo(data.data);
+                    } else {
+                        $('#system-info-content').html('<div class="error">Error: ' + data.error + '</div>');
+                    }
+                })
+                .fail(function() {
+                    $('#system-info-content').html('<div class="error">Failed to connect to server</div>');
+                });
+        }
+        
+        function loadNetworkInfo() {
+            const startTime = Date.now();
+            updateConnectionStatus('connecting');
+            
+            $.get('/network_info')
+                .done(function(data) {
+                    const responseTime = Date.now() - startTime;
+                    $('#response-time').text(responseTime + 'ms');
+                    
+                    if (data.success) {
+                        displayNetworkInfo(data.data);
+                        updateConnectionStatus('connected');
+                        updateLastCheck();
+                    } else {
+                        $('#network-info-content').html('<div class="error">Error: ' + data.error + '</div>');
+                        updateConnectionStatus('error');
+                    }
+                })
+                .fail(function() {
+                    $('#network-info-content').html('<div class="error">Failed to connect to server</div>');
+                    updateConnectionStatus('disconnected');
+                    $('#response-time').text('Timeout');
+                });
+        }
+        
+        function displaySystemInfo(data) {
+            const response = data.response || data;
+            let html = '<div class="info-grid">';
+            
+            const systemFields = [
+            { key: 'unit_serial', label: 'Unit Serial' },
+            { key: 'hardware_serial_number', label: 'PCB Serial' },
+            { key: 'production_date', label: 'Production date'},
+            { key: 'software_revision', label: 'Firmware revision' },
             { key: 'hardware_revision', label: 'Hardware' }
-        ];
-        
-        systemFields.forEach(field => {
+            ];
+            
+            systemFields.forEach(field => {
             if (response[field.key]) {
-                html += `<div class="info-item">
-                    <span class="info-label">${field.label}:</span>
-                    <span class="info-value">${response[field.key]}</span>
-                </div>`;
-            }
-        });
-        
-        html += '</div>';
-        $('#system-info-content').html(html);
-    }
-    
-    function displayNetworkInfo(data) {
-        const response = data.response || data;
-        let html = '<div class="network-grid">';
-        
-        const networkFields = [
-            { key: 'ip_address', label: 'IP Address', priority: 'high' },
-            { key: 'subnet_mask', label: 'Subnet Mask', priority: 'high' },
-            { key: 'gateway', label: 'Gateway', priority: 'high' },
-            { key: 'mac_address', label: 'MAC Address', priority: 'medium' },
-            { key: 'dns_server', label: 'DNS Server', priority: 'medium' },
-            { key: 'hostname', label: 'Hostname', priority: 'medium' },
-            { key: 'tcp_port', label: 'TCP Port', priority: 'low' }
-        ];
-        
-        networkFields.forEach(field => {
-            if (response[field.key] !== undefined && response[field.key] !== null) {
                 let value = response[field.key];
                 
-                html += `<div class="network-item priority-${field.priority}">
-                    <span class="network-label">${field.label}:</span>
-                    <span class="network-value">${value}</span>
+                // Format production_date from yyyymmdd to yyyy-mm-dd
+                if (field.key === 'production_date' && value.length === 8) {
+                value = value.substring(0, 4) + '-' + value.substring(4, 6) + '-' + value.substring(6, 8);
+                }
+                
+                html += `<div class="info-item">
+                <span class="info-label">${field.label}:</span>
+                <span class="info-value">${value}</span>
                 </div>`;
             }
-        });
-        
-        // Show any additional fields that weren't mapped (excluding DHCP)
-        for (let key in response) {
-            if (response.hasOwnProperty(key) && 
-                !networkFields.find(f => f.key === key) && 
-                key !== 'dhcp_enabled') { // Explicitly exclude DHCP
-                html += `<div class="network-item priority-low">
-                    <span class="network-label">${key.replace(/_/g, ' ').toUpperCase()}:</span>
-                    <span class="network-value">${JSON.stringify(response[key])}</span>
-                </div>`;
-            }
-        }
-        
-        html += '</div>';
-        $('#network-info-content').html(html);
-    }
-    
-    function toggleAutoRefresh() {
-        autoRefreshEnabled = !autoRefreshEnabled;
-        const button = $('#toggle-auto-refresh');
-        
-        if (autoRefreshEnabled) {
-            button.text('Auto Refresh: ON').removeClass('btn-secondary').addClass('btn-success');
-            autoRefreshInterval = setInterval(loadNetworkInfo, 10000); // Refresh every 10 seconds
-        } else {
-            button.text('Auto Refresh: OFF').removeClass('btn-success').addClass('btn-secondary');
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-            }
-        }
-    }
-    
-    function showRawData() {
-        $.get('/api/network_info/raw')
-            .done(function(data) {
-                $('#raw-data-content').text(JSON.stringify(data, null, 2));
-                $('#raw-data-card').slideDown();
-            })
-            .fail(function() {
-                $('#raw-data-content').text('Failed to fetch raw data');
-                $('#raw-data-card').slideDown();
             });
-    }
-    
-    function hideRawData() {
-        $('#raw-data-card').slideUp();
-    }
-    
-    function copyRawData() {
-        const rawData = $('#raw-data-content').text();
-        navigator.clipboard.writeText(rawData).then(function() {
-            const button = $('#copy-raw-data');
-            const originalText = button.text();
-            button.text('Copied!').removeClass('btn-info').addClass('btn-success');
-            setTimeout(() => {
-                button.text(originalText).removeClass('btn-success').addClass('btn-info');
-            }, 2000);
-        });
-    }
-    
-    function updateConnectionStatus(status) {
-        const indicator = $('#connection-indicator');
-        const footerStatus = $('#connection-status');
-        
-        indicator.removeClass('connected disconnected error unknown connecting');
-        
-        switch(status) {
-            case 'connected':
-                indicator.text('Connected').addClass('connected');
-                footerStatus.text('Connected');
-                break;
-            case 'disconnected':
-                indicator.text('Disconnected').addClass('disconnected');
-                footerStatus.text('Disconnected');
-                break;
-            case 'error':
-                indicator.text('Error').addClass('error');
-                footerStatus.text('Error');
-                break;
-            case 'connecting':
-                indicator.text('Connecting...').addClass('connecting');
-                footerStatus.text('Connecting...');
-                break;
-            default:
-                indicator.text('Unknown').addClass('unknown');
-                footerStatus.text('Unknown');
+            
+            html += '</div>';
+            $('#system-info-content').html(html);
         }
-    }
-    
-    function updateLastCheck() {
-        const now = new Date();
-        $('#last-check').text(now.toLocaleTimeString());
-        $('#last-update').text('Last updated: ' + now.toLocaleString());
-    }
-    
-    // Network configuration form functions
-    function showConfigForm() {
-        $('#network-config-card').slideDown();
-        $('#toggle-config-form').text('Hide Configuration').removeClass('btn-warning').addClass('btn-secondary');
-    }
-    
-    function hideConfigForm() {
-        $('#network-config-card').slideUp();
-        $('#toggle-config-form').text('Configure Network').removeClass('btn-secondary').addClass('btn-warning');
-        resetConfigForm();
-    }
-    
-    function loadCurrentConfig() {
-        $.get('/network_info')
-            .done(function(data) {
-                if (data.success && data.data && data.data.response) {
-                    const config = data.data.response;
-                    $('#ip_address').val(config.ip_address || '');
-                    $('#subnet_mask').val(config.subnet_mask || '');
-                    $('#gateway').val(config.gateway || '');
-                    $('#hostname').val(config.hostname || '');
-                    $('#mac_address').val(config.mac_address || '');
-                    $('#tcp_port').val(config.tcp_port || '');
+        
+        function displayNetworkInfo(data) {
+            const response = data.response || data;
+            let html = '<div class="network-grid">';
+            
+            const networkFields = [
+                { key: 'ip_address', label: 'IP Address' },
+                { key: 'subnet_mask', label: 'Subnet Mask' },
+                { key: 'gateway', label: 'Gateway' },
+                { key: 'mac_address', label: 'MAC Address' },
+                { key: 'hostname', label: 'Hostname' },
+                { key: 'tcp_port', label: 'TCP Port' }
+            ];
+            
+            networkFields.forEach(field => {
+                if (response[field.key] !== undefined && response[field.key] !== null) {
+                    let value = response[field.key];
                     
-                    Utils.showNotification('Current configuration loaded successfully', 'success');
+                    html += `<div class="network-item">
+                        <span class="network-label">${field.label}:</span>
+                        <span class="network-value">${value}</span>
+                    </div>`;
+                }
+            });
+            
+            html += '</div>';
+            $('#network-info-content').html(html);
+        }
+        
+        function updateConnectionStatus(status) {
+            const indicator = $('#connection-indicator');
+            const footerStatus = $('#connection-status');
+            
+            switch(status) {
+                case 'connected':
+                    indicator.text('Connected');
+                    footerStatus.text('Connected');
+                    break;
+                case 'disconnected':
+                    indicator.text('Disconnected');
+                    footerStatus.text('Disconnected');
+                    break;
+                case 'error':
+                    indicator.text('Error');
+                    footerStatus.text('Error');
+                    break;
+                case 'connecting':
+                    indicator.text('Connecting...');
+                    footerStatus.text('Connecting...');
+                    break;
+                default:
+                    indicator.text('Unknown');
+                    footerStatus.text('Unknown');
+            }
+        }
+        
+        function updateLastCheck() {
+            const now = new Date();
+            $('#last-check').text(now.toLocaleString());
+            $('#last-update').text('Last updated: ' + now.toLocaleString());
+        }
+        
+        function loadCurrentConfig() {
+            $.get('/network_info')
+                .done(function(data) {
+                    if (data.success && data.data && data.data.response) {
+                        const config = data.data.response;
+                        $('#ip_address').val(config.ip_address || '');
+                        $('#subnet_mask').val(config.subnet_mask || '');
+                        $('#gateway').val(config.gateway || '');
+                        $('#hostname').val(config.hostname || '');
+                        $('#tcp_port').val(config.tcp_port || '');
+                    }
+                });
+        }
+        
+        function validateNetworkConfiguration() {
+            const formData = getFormData();
+            
+            if (Object.keys(formData).length === 0) {
+                showValidationResults('Please fill in at least one field to validate', 'error');
+                return;
+            }
+            
+            fetch('/api/validate_network_config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showValidationResults('Configuration is valid!', 'success');
                 } else {
-                    Utils.showNotification('Failed to load current configuration', 'error');
+                    showValidationResults(`Validation failed: ${data.error}`, 'error');
+                }
+            });
+        }
+        
+        function applyNetworkConfiguration() {
+            console.log('Apply configuration called'); // Debug line
+            
+            const formData = getFormData();
+            
+            if (Object.keys(formData).length === 0) {
+                alert('Please fill in at least one field');
+                return;
+            }
+            
+            if (!confirm('Apply network configuration changes? This will save settings to the device.')) {
+                return;
+            }
+            
+            // Disable button during request
+            $('#apply-config').prop('disabled', true).text('Applying...');
+            
+            fetch('/api/set_network_config', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response:', data); // Debug line
+                
+                if (data.success) {
+                    alert('Configuration applied successfully!');
+                    resetNetworkConfigForm();
+                    // Refresh network info after a delay
+                    setTimeout(() => {
+                        loadSystemInfo();
+                        loadNetworkInfo();
+                    }, 2000);
+                } else {
+                    alert('Configuration failed: ' + (data.error || 'Unknown error'));
                 }
             })
-            .fail(function() {
-                Utils.showNotification('Error loading current configuration', 'error');
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error applying configuration: ' + error.message);
+            })
+            .finally(() => {
+                // Re-enable button
+                $('#apply-config').prop('disabled', false).text('Apply & Save');
             });
-    }
-    
-    function validateConfiguration() {
-        const formData = getFormData();
-        let errors = [];
-        let warnings = [];
-        
-        // Validate IP address
-        if (formData.ip_address && !Utils.isValidIP(formData.ip_address)) {
-            errors.push('Invalid IP address format');
         }
         
-        // Validate subnet mask
-        if (formData.subnet_mask && !Utils.isValidIP(formData.subnet_mask)) {
-            errors.push('Invalid subnet mask format');
-        }
-        
-        // Validate gateway
-        if (formData.gateway && !Utils.isValidIP(formData.gateway)) {
-            errors.push('Invalid gateway address format');
-        }
-        
-        // Validate MAC address
-        if (formData.mac_address && !Utils.isValidMAC(formData.mac_address)) {
-            errors.push('Invalid MAC address format');
-        }
-        
-        // Validate TCP port
-        if (formData.tcp_port && (formData.tcp_port < 1 || formData.tcp_port > 65535)) {
-            errors.push('TCP port must be between 1 and 65535');
-        }
-        
-        // Check subnet consistency
-        if (formData.ip_address && formData.gateway && Utils.isValidIP(formData.ip_address) && Utils.isValidIP(formData.gateway)) {
-            const ipParts = formData.ip_address.split('.');
-            const gatewayParts = formData.gateway.split('.');
-            if (ipParts[0] !== gatewayParts[0] || ipParts[1] !== gatewayParts[1]) {
-                warnings.push('IP address and gateway might not be in the same subnet');
+        function getFormData() {
+            const form = document.getElementById('network-config-form');
+            const formData = new FormData(form);
+            const configData = {};
+            
+            // Convert FormData to object, only include non-empty values
+            for (let [key, value] of formData.entries()) {
+                if (value && value.trim()) {
+                    configData[key] = value.trim();
+                }
             }
+            
+            console.log('Form data:', configData); // Debug line
+            return configData;
         }
         
-        displayValidationResults(errors, warnings);
-        
-        if (errors.length === 0) {
-            Utils.showNotification('Configuration validation passed!', 'success');
-        } else {
-            Utils.showNotification('Configuration validation failed', 'error');
-        }
-    }
-    
-    function applyNetworkConfiguration() {
-        const formData = getFormData();
-        
-        // Remove empty values
-        Object.keys(formData).forEach(key => {
-            if (!formData[key] || formData[key] === '') {
-                delete formData[key];
-            }
-        });
-        
-        if (Object.keys(formData).length === 0) {
-            Utils.showNotification('No configuration changes to apply', 'warning');
-            return;
+        function resetNetworkConfigForm() {
+            document.getElementById('network-config-form').reset();
+            $('#config-validation').hide();
         }
         
-        // Show confirmation dialog
-        if (!confirm('Are you sure you want to apply these network configuration changes? This may temporarily disconnect the device.')) {
-            return;
+        function showValidationResults(message, type) {
+            const validationDiv = $('#config-validation');
+            validationDiv.removeClass('success error');
+            validationDiv.addClass(type);
+            validationDiv.html(`<p>${message}</p>`);
+            validationDiv.show();
         }
-        
-        $('#apply-config').prop('disabled', true).text('Applying...');
-        
-        $.ajax({
-            url: '/api/set_network_config',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(formData)
-        })
-        .done(function(data) {
-            if (data.success) {
-                Utils.showNotification('Network configuration applied successfully!', 'success');
-                hideConfigForm();
-                
-                // Refresh network info after a short delay
-                setTimeout(loadNetworkInfo, 2000);
-            } else {
-                Utils.showNotification('Failed to apply configuration: ' + data.error, 'error');
-            }
-        })
-        .fail(function(xhr) {
-            const error = xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error';
-            Utils.showNotification('Error applying configuration: ' + error, 'error');
-        })
-        .always(function() {
-            $('#apply-config').prop('disabled', false).text('Apply Configuration');
-        });
-    }
-    
-    function flashROM() {
-        if (!confirm('Are you sure you want to flash the ROM? This will permanently save the current configuration.')) {
-            return;
-        }
-        
-        showStatusMessage('Flashing ROM...', 'info');
-        
-        fetch('/api/flash_rom', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showStatusMessage('ROM flashed successfully! Configuration saved permanently.', 'success');
-            } else {
-                showStatusMessage(`Flash ROM failed: ${data.error}`, 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Flash ROM error:', error);
-            showStatusMessage('Flash ROM request failed', 'error');
-        });
-    }
-    
-    // Validate Configuration function
-    function validateNetworkConfiguration() {
-        const formData = getFormData();
-        
-        if (Object.keys(formData).length === 0) {
-            showValidationResults('Please fill in at least one field to validate', 'error');
-            return;
-        }
-
-        showStatusMessage('Validating configuration...', 'info');
-        
-        fetch('/api/validate_network_config', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showValidationResults('Configuration is valid!', 'success');
-            } else {
-                showValidationResults(`Validation failed: ${data.error}`, 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Validation error:', error);
-            showValidationResults('Validation request failed', 'error');
-        });
-    }
-
-
-    function getFormData() {
-        const formData = new FormData(document.getElementById('network-config-form'));
-        const configData = {};
-        
-        // Convert FormData to object, only include non-empty values
-        for (let [key, value] of formData.entries()) {
-            if (value.trim()) {
-                configData[key] = value.trim();
-            }
-        }
-        
-        return configData;
-    }
-
-    // Helper function to reset form
-    function resetNetworkConfigForm() {
-        document.getElementById('network-config-form').reset();
-        $('#config-validation').hide();
-    }
-
-    // Helper function to show validation results
-    function showValidationResults(message, type) {
-        const validationDiv = $('#config-validation');
-        validationDiv.removeClass('success error info warning');
-        validationDiv.addClass(type);
-        validationDiv.html(`<p>${message}</p>`);
-        validationDiv.show();
-    }
-    
-    function resetConfigForm() {
-        $('#network-config-form')[0].reset();
-        $('#config-validation').hide();
-    }
-    
-    function displayValidationResults(errors, warnings) {
-        let html = '';
-        
-        if (errors.length > 0) {
-            html += '<div class="validation-errors"><h4>Errors:</h4><ul>';
-            errors.forEach(error => html += `<li>${error}</li>`);
-            html += '</ul></div>';
-        }
-        
-        if (warnings.length > 0) {
-            html += '<div class="validation-warnings"><h4>Warnings:</h4><ul>';
-            warnings.forEach(warning => html += `<li>${warning}</li>`);
-            html += '</ul></div>';
-        }
-        
-        if (errors.length === 0 && warnings.length === 0) {
-            html = '<div class="validation-success"><h4>Configuration looks good!</h4></div>';
-        }
-        
-        $('#config-validation').html(html).show();
-    }
-    
-    // Cleanup on page unload
-    $(window).on('beforeunload', function() {
-        if (autoRefreshInterval) {
-            clearInterval(autoRefreshInterval);
-        }
-    });
-</script>
-{% endblock %}
+    </script>
+</body>
+</html>
