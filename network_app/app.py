@@ -92,21 +92,18 @@ def set_network_config():
                 params['gateway'] = data['gateway']
             if 'hostname' in data:
                 params['hostname'] = data['hostname']
+            if 'mac_address' in data:
+                params['mac_address'] = data['mac_address']
             if 'tcp_port' in data:
                 params['tcp_port'] = int(data['tcp_port'])
 
             # Set the network configuration
             results = client.set_smgr_network_config(**params)
 
-            # Flash ROM to save changes permanently
-            flash_result = client.custom_api_request(
-                COMMAND_ID['SET'], b'SMGR', b'FLSH', b'\x01\x00')
-
             return jsonify({
                 'success': True,
-                'message': 'Network configuration updated and saved to ROM successfully',
-                'results': results,
-                'flash_result': flash_result
+                'message': 'Network configuration updated successfully',
+                'results': results
             })
 
     except ValueError as e:
