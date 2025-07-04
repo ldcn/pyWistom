@@ -68,20 +68,20 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="gateway">Gateway:</label>
-                            <input type="text" id="gateway" name="gateway">
+                            <label for="gateway_address">Gateway:</label>
+                            <input type="text" id="gateway_address" name="gateway_address">
                             <small class="form-help">Gateway IP</small>
                         </div>
                         
                         <div class="form-group">
-                            <label for="hostname">Hostname:</label>
-                            <input type="text" id="hostname" name="hostname">
+                            <label for="host_name">Hostname:</label>
+                            <input type="text" id="host_name" name="host_name">
                             <small class="form-help">Device name</small>
                         </div>
                         
                         <div class="form-group">
-                            <label for="tcp_port">TCP Port:</label>
-                            <input type="number" id="tcp_port" name="tcp_port" min="1" max="65535">
+                            <label for="listening_port">TCP Port:</label>
+                            <input type="number" id="listening_port" name="listening_port" min="1" max="65535">
                             <small class="form-help">Port (1-65535, default: 7734)</small>
                         </div>
                     </div>
@@ -197,7 +197,7 @@
         
         function displayNetworkInfo(data) {
             const response = data.response || data;
-            let html = '<div class="network-grid">';
+            let html = '<div class="info-grid">';
             
             const networkFields = [
                 { key: 'ip_address', label: 'IP Address' },
@@ -212,9 +212,9 @@
                 if (response[field.key] !== undefined && response[field.key] !== null) {
                     let value = response[field.key];
                     
-                    html += `<div class="network-item">
-                        <span class="network-label">${field.label}:</span>
-                        <span class="network-value">${value}</span>
+                    html += `<div class="info-item">
+                        <span class="info-label">${field.label}:</span>
+                        <span class="info-value">${value}</span>
                     </div>`;
                 }
             });
@@ -263,9 +263,10 @@
                         const config = data.data.response;
                         $('#ip_address').val(config.ip_address || '');
                         $('#subnet_mask').val(config.subnet_mask || '');
-                        $('#gateway').val(config.gateway || '');
-                        $('#hostname').val(config.hostname || '');
-                        $('#tcp_port').val(config.tcp_port || '');
+                        $('#gateway_address').val(config.gateway_address || '');
+                        $('#host_name').val(config.host_name || '');
+                        $('#mac_address').val(config.mac_address || '');
+                        $('#listening_port').val(config.listening_port || '');
                     }
                 });
         }
