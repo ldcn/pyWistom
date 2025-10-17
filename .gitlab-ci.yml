@@ -21,7 +21,6 @@ stages:
   - test
   - build
   - docs
-  - deploy
 
 lint:
   stage: lint
@@ -58,9 +57,3 @@ docs:
   artifacts:
     paths:
       - docs/_build/html
-
-deploy:
-  stage: deploy
-  script:
-    - echo "Deploy step (add your deployment commands here)"
-  when: manual
