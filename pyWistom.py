@@ -1,6 +1,7 @@
 import socket
 import struct
-import ssl
+import cProfile
+import pstats
 
 from wistomconfig import (
     HOST,
@@ -34,8 +35,9 @@ MAX_TAGS = 255
 
 
 class WistomClient:
-    def __init__(self, host, port, user_id, password):
-        self.connection = WistomConnection(host, port)
+    def __init__(self, host, port, user_id, password, use_ssh=False):
+        self.connection = WistomConnection(
+            host, port, use_ssh, user_id, password)
 
         self.user_id = user_id
         self.password = password
@@ -909,17 +911,16 @@ class WistomClient:
 if __name__ == "__main__":
 
     print(f"Connecting to {HOST}:{PORT}")
-    with WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
-        # Wrap the socket in TLS
-        client.connection.socket = ssl.wrap_socket(
-            client.connection.socket,
-            ssl_version=ssl.PROTOCOL_TLS_CLIENT
-        )
+    with WistomClient(HOST, PORT, USER_ID, PASSWORD, use_ssh=True) as client:
 
         login_response = client.login()
         print("Login Response:", login_response)
         client.custom_api_request(COMMAND_ID['GET'], b'WSNS', b'NEXT', b'')
 
-        if login_response.get("command_id") == 'LOGINIRES':
-            network_info_resp = client.get_smgr_network_info()
-            print("Network Info:", network_info_resp)
+        profiler = cProfile.Profile()
+        profiler.enable()
+        client.get_smgr_info()
+        profiler.disable()
+        stats = pstats.Stats(profiler)
+        stats.sort_stats('cumulative')
+        stats.print_stats(10)
