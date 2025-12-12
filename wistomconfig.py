@@ -4,3 +4,7 @@ USER_ID = "admin"
 PASSWORD = "admin"
 # API_VERSION = "LGIN" # API Version 1
 API_VERSION = "API2"  # API Version 2
+
+# SSH Configuration
+SSH_HOST = HOST
+SSH_PORT = 22

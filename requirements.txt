@@ -1,3 +1,4 @@
 # Core requirements for pyWistom
 flake8
 sphinx
+sshtunnel
