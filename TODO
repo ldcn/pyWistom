@@ -1,22 +1,180 @@
 # TODO List for pyWistom Project
 
-- [X] Move hardcoded connection stuff (ip, port, user, password) to config file.
-- [ ] Add error handling for socket/connection errors
-- [ ] Write unit tests for `login` and `send_request`.
-- [ ] Add support for SMGR commands.
-- [ ] Create a CLI similar to the wistsh MMI
-- [ ] Add logging
+## Priority 1: Documentation (Docstrings)
+
+Reference: `100051.html` - Wistom API specification
+
+### LGIN (Login/User Management)
+- [ ] `login()` - LGIN LGIN/API2: Start session with user credentials
+- [ ] LGIN CPWD: Change password
+- [ ] LGIN COPW: Change others password
+- [ ] LGIN UADD: User add
+- [ ] LGIN UDEL: User delete
+- [ ] LGIN UINF: User information
+- [ ] LGIN SINF: Session info
+
+### SMGR (System Manager)
+- [ ] `get_smgr_info()` - SMGR INFO: Product info (HW/SW versions, serial numbers, calibration data)
+- [ ] `get_smgr_network_info()` - SMGR IP##: IP settings (address, subnet, gateway, hostname, MAC, port)
+- [ ] `get_smgr_serial_settings()` - SMGR SER#: Serial (RS232) settings
+- [ ] `get_smgr_time()` - SMGR TIME: Date and time
+- [ ] `get_smgr_temp()` - SMGR TEMP: Temperature (board, sensor, FPGA, configured limits)
+- [ ] `get_smgr_uptime()` - SMGR UPTI: System running time (uptime, app uptime, load average)
+- [ ] `get_snmp_agent_listening_port()` - SMGR SCFG: SNMP configuration
+- [ ] `get_snmp_trap_receivers()` - SMGR SLTR: SNMP list trap receivers
+- [ ] SMGR API#: API definition table
+- [ ] SMGR CLRD: Clear error dump
+- [ ] SMGR DUMP: Error dump
+- [ ] SMGR FLSH: Save configuration (SET only)
+- [ ] SMGR HIDD: Activate hidden MMI commands
+- [ ] SMGR INST: Feature installation (SNMP agent)
+- [ ] SMGR LED#: LED status
+- [ ] SMGR REST: Restart system (SET only)
+- [ ] SMGR SATR: SNMP add trap receiver (SET only)
+- [ ] SMGR SDTR: SNMP delete trap receiver (SET only)
+- [ ] SMGR VOLT: System voltages and current
+
+### WSNS (WistSense)
+- [ ] WSNS DATA: Get spectra for debugging
+- [ ] WSNS ENAB: Enable/disable WistSense
+- [ ] WSNS FILT: Software filtering of spectra
+- [ ] WSNS NEXT: Get current peak frequencies
+- [ ] WSNS PARA: WistSense parameters
+- [ ] WSNS PORT: Calibration and sensor ports
+- [ ] WSNS RAWB: Raw spectrum without bias correction
+
+### OPM# (Optical Performance Monitor)
+- [ ] OPM# AVRG: OPM average
+- [ ] OPM# CALA: Calibration data for all channels
+- [ ] OPM# CALC: Power calculation
+- [ ] OPM# CALD: Channel status for calibration
+- [ ] OPM# CHAL: All channel status
+- [ ] OPM# CHCO: Channel configuration
+- [ ] OPM# CHNL: Channel status
+- [ ] OPM# CNFG: OPM configuration
+- [ ] OPM# CSPC: Compact spectrum
+- [ ] OPM# ENAB: OPM enable
+- [ ] OPM# FILW: Filter width
+- [ ] OPM# FRQO: Frequency options
+- [ ] OPM# FSPC: Frequency spectrum
+- [ ] OPM# MINL: Minimum level
+- [ ] OPM# OSNR: OSNR configuration
+- [ ] OPM# OUTP: Output spectrum specification
+- [ ] OPM# PCRI: Peak criteria
+- [ ] OPM# RAWD: Raw data
+- [ ] OPM# SFBW: System filter bandwidth
+- [ ] OPM# SWHA: Switch handling
+- [ ] OPM# TPWR: Total power over spectrum
+- [ ] OPM# TRSH: Threshold
+- [ ] OPM# TSPC: Time spectrum
+- [ ] OPM# WSPC: Wavelength spectrum
+
+### PULF (Pulse Frequency Control)
+- [ ] PULF COMP: Pulse frequency compensation toggle
+- [ ] PULF PULS: Pulse resonance spectrum
+- [ ] PULF REGC: Frequency regulator control
+- [ ] PULF REGP: Frequency PID regulator
+- [ ] PULF REGV: Pulse frequency controller values
+- [ ] PULF REGZ: Frequency Z regulator
+- [ ] PULF RESC: Pulse resonance spectrum configuration
+- [ ] PULF RTEC: Repeat time event control
+
+### ALMH (Alarm Handler)
+- [ ] ALMH ALRM: Alarm status
+- [ ] ALMH SUBS: Alarm subscribe
+- [ ] ALMH TITY: Alarm time stamp type
+- [ ] ALMH UNSU: Alarm unsubscribe
+
+### SPEC (Spectrum Parameters)
+- [ ] SPEC CHNL: Channel configuration
+- [ ] SPEC COMP: Spectrum compression
+- [ ] SPEC CTBL: Configured channels table
+- [ ] SPEC DELC: Delete channel configuration
+- [ ] SPEC FILT: Hardware filtering of spectrum
+- [ ] SPEC LMTS: Calibration limits
+- [ ] SPEC PWRA: Switch power adjustment
+- [ ] SPEC SUBS: Sub-scanning
+- [ ] SPEC SWCO: Switch port configuration
+- [ ] SPEC SWIN: Switch install
+- [ ] SPEC SWMO: Switch scan mode
+
+### WICA (WISTOM Internal Calibration)
+- [ ] WICA ACUT: Actuator configuration update time
+- [ ] WICA BIAS: Bias offset on ADC channel
+- [ ] WICA CALD: Calibration daemon
+- [ ] WICA CHAN: Optical ADC channel selection
+- [ ] WICA CTEL: LUT indexing configuration
+- [ ] WICA FBDW: Filter bandwidth
+- [ ] WICA FLIM: Calibrated spectrum limits
+- [ ] WICA FRQC: Frequency compensation
+- [ ] WICA LUT#: A/D-converter look-up table
+- [ ] WICA LUTF: Factor LUT for calibration
+- [ ] WICA LUTK: Factor for frequency calibration
+- [ ] WICA LUTL: Offset LUT for frequency calibration
+- [ ] WICA LUTP: LUT for pulse period
+- [ ] WICA PABC: Pulse amplifier attenuation control
+- [ ] WICA PULF: Actuator pulse form
+- [ ] WICA PULP: Pulse period
+- [ ] WICA PWRC: Power compensation
+- [ ] WICA SABC: Sampling auto bias control
+- [ ] WICA SCAS: Scan size
+- [ ] WICA STAB: Save tables to permanent storage
+- [ ] WICA STRD: Start delay
+- [ ] WICA TLIM: Calibrated temperature limits
+
+### Internal Parser Methods
+- [ ] Add docstrings to all `_parse_*` methods in pyWistom.py
+- [ ] Include real device output examples in docstrings
+
+## Priority 2: Automatic Documentation Generation
+
+- [ ] Configure Sphinx autodoc in `docs/conf.py`
+- [ ] Update `docs/index.rst` with API reference sections
+- [ ] Add documentation testing to workflow:
+  - [ ] Install `pydocstyle` for docstring linting
+  - [ ] Install `interrogate` for coverage reporting
+  - [ ] Configure `sphinx-build -W` for strict builds
+- [ ] Document target: 80%+ public method coverage
+- [ ] Add `make doctest` target for example validation
+
+## Priority 3: Modbus TCP Implementation
+
+Design from scratch - expose Wistom API data as Modbus holding registers.
+
+- [ ] Create `wistom_modbus_server.py`
+- [ ] Define register map (see copilot-instructions.md):
+  - [ ] SMGR registers (40000-40999): TEMP, UPTI, TIME, INFO, IP##
+  - [ ] WSNS registers (41000-41999): DATA, NEXT
+  - [ ] OPM# registers (42000-42999): channel data, spectrum data
+- [ ] Implement data type conversions:
+  - [ ] FLOAT32 → 2 registers (big-endian IEEE 754)
+  - [ ] UINT32 → 2 registers (big-endian)
+  - [ ] STRING → N registers (2 ASCII chars per register)
+- [ ] Add periodic polling from WistomClient to update registers
+- [ ] Add `pymodbus` to requirements.txt
+
+---
+
+## Completed
+
+- [X] Move hardcoded connection stuff (ip, port, user, password) to config file
 - [X] Fix handling of "unknown" responses
 
-## Security
+## Backlog
+
+### Core Functionality
+- [ ] Add error handling for socket/connection errors
+- [ ] Write unit tests for `login` and `send_request`
+- [ ] Create a CLI similar to the wistsh MMI
+- [ ] Add logging
+
+### Security
 - [ ] Mask password entry
 
-## Documentation
-- [ ] Add docstrings to public methods, test with pydoc or similar.
+### Documentation
 - [ ] Add more info in README
 
-## Other stuff
+### Integrations
 - [ ] jsonify responses (with flask.jsonify)
 - [ ] output graph data with matplotlib/pandas
 - [ ] OPC-UA Client
-- [ ] Modbus TCP
