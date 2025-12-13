@@ -1,3 +1,9 @@
+"""
+Response parser routing for Wistom API commands.
+
+Maps command types to parser methods for processing binary responses.
+Used by WistomClient to dispatch responses to appropriate parsers.
+"""
 from wistomconstants import COMMAND_ID
 
 # Parsers for response headers

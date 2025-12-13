@@ -1,3 +1,12 @@
+"""
+Tag-to-field-name mappings for Wistom API response parsing.
+
+Maps binary tag IDs to human-readable field names, organized by
+application ID (app_id) and operation ID (op_id).
+
+Structure: TAG_PARSER[app_id][op_id][tag_byte] = field_name
+"""
+
 # Tag parsers
 
 TAG_PARSER = {
@@ -350,6 +359,9 @@ TAG_PARSER = {
         }
     },
     'WSNS': {
+        'ENAB': {
+            1: "enabled",  # UINT8 (bool)
+        },
         'NEXT': {
             101: "port_1_peak_frequencies",
             102: "port_2_peak_frequencies",
@@ -383,6 +395,7 @@ TAG_PARSER = {
             164: "port_14_peak_widths",
             165: "port_15_peak_widths",
             166: "port_16_peak_widths",
+            # Amplitude tags: may be 201-216 or 221-236 depending on firmware
             201: "port_1_peak_amplitudes",
             202: "port_2_peak_amplitudes",
             203: "port_3_peak_amplitudes",
@@ -399,11 +412,36 @@ TAG_PARSER = {
             214: "port_14_peak_amplitudes",
             215: "port_15_peak_amplitudes",
             216: "port_16_peak_amplitudes",
+            # Alternative amplitude tag range (per 114605.html)
+            221: "port_1_peak_amplitudes",
+            222: "port_2_peak_amplitudes",
+            223: "port_3_peak_amplitudes",
+            224: "port_4_peak_amplitudes",
+            225: "port_5_peak_amplitudes",
+            226: "port_6_peak_amplitudes",
+            227: "port_7_peak_amplitudes",
+            228: "port_8_peak_amplitudes",
+            229: "port_9_peak_amplitudes",
+            230: "port_10_peak_amplitudes",
+            231: "port_11_peak_amplitudes",
+            232: "port_12_peak_amplitudes",
+            233: "port_13_peak_amplitudes",
+            234: "port_14_peak_amplitudes",
+            235: "port_15_peak_amplitudes",
+            236: "port_16_peak_amplitudes",
             3: "interferometer_linear_fit",
             4: "absolute_reference_linear_fit",
             5: "number_of_data_points",
             6: "first_and_last_crossing",
             7: "frequency_errors",
+        },
+        'FILT': {
+            1: "filter_type",        # UINT8
+            2: "filter_coefficient",  # FLOAT64
+        },
+        'RAWB': {
+            1: "port_selection",  # UINT8
+            11: "raw_spectrum",   # length(U32) + FLOAT32[]
         },
         'PORT': {
             **{101 + i: f"port_{i + 1}" for i in range(50)}

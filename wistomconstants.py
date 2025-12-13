@@ -1,3 +1,12 @@
+"""
+Protocol constants for the Wistom binary API.
+
+Contains command identifiers, login results, error codes, and data type
+enumerations as defined in the Wistom API specification (100051).
+
+See Chapter 11 of the Wistom User Guide for detailed descriptions.
+"""
+
 # Command identifiers (Chapter 11 Tables 11-2 to 11-10 in Wistom User Guide)
 
 COMMAND_ID = {
