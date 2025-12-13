@@ -6,11 +6,14 @@
 Welcome to pyWistom's documentation!
 ====================================
 
+pyWistom is a Python wrapper for the Wistom proprietary binary API,
+used to communicate with Proximion fiber optic sensing devices over TCP sockets.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-
+   api
 
 Indices and tables
 ==================
