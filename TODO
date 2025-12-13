@@ -1,11 +1,18 @@
 # TODO List for pyWistom Project
 
-## Priority 1: Documentation (Docstrings)
+## Priority 1: Documentation (Docstrings) ✅ COMPLETED
+
+**Status**: 100% docstring coverage achieved for all modules
+- pyWistom.py: 100% (47/47 items)
+- wistomconnection.py: 100% (9/9 items)
+- wistomconstants.py: 100% (1/1 items)
+- wistomresponses.py: 100% (1/1 items)
+- wistomtags.py: 100% (1/1 items)
 
 Reference: `100051.html` - Wistom API specification
 
 ### LGIN (Login/User Management)
-- [ ] `login()` - LGIN LGIN/API2: Start session with user credentials
+- [x] `login()` - LGIN LGIN/API2: Start session with user credentials
 - [ ] LGIN CPWD: Change password
 - [ ] LGIN COPW: Change others password
 - [ ] LGIN UADD: User add
@@ -14,14 +21,14 @@ Reference: `100051.html` - Wistom API specification
 - [ ] LGIN SINF: Session info
 
 ### SMGR (System Manager)
-- [ ] `get_smgr_info()` - SMGR INFO: Product info (HW/SW versions, serial numbers, calibration data)
-- [ ] `get_smgr_network_info()` - SMGR IP##: IP settings (address, subnet, gateway, hostname, MAC, port)
-- [ ] `get_smgr_serial_settings()` - SMGR SER#: Serial (RS232) settings
-- [ ] `get_smgr_time()` - SMGR TIME: Date and time
-- [ ] `get_smgr_temp()` - SMGR TEMP: Temperature (board, sensor, FPGA, configured limits)
-- [ ] `get_smgr_uptime()` - SMGR UPTI: System running time (uptime, app uptime, load average)
-- [ ] `get_snmp_agent_listening_port()` - SMGR SCFG: SNMP configuration
-- [ ] `get_snmp_trap_receivers()` - SMGR SLTR: SNMP list trap receivers
+- [x] `get_smgr_info()` - SMGR INFO: Product info (HW/SW versions, serial numbers, calibration data)
+- [x] `get_smgr_network_info()` - SMGR IP##: IP settings (address, subnet, gateway, hostname, MAC, port)
+- [x] `get_smgr_serial_settings()` - SMGR SER#: Serial (RS232) settings
+- [x] `get_smgr_time()` - SMGR TIME: Date and time
+- [x] `get_smgr_temp()` - SMGR TEMP: Temperature (board, sensor, FPGA, configured limits)
+- [x] `get_smgr_uptime()` - SMGR UPTI: System running time (uptime, app uptime, load average)
+- [x] `get_snmp_agent_listening_port()` - SMGR SCFG: SNMP configuration
+- [x] `get_snmp_trap_receivers()` - SMGR SLTR: SNMP list trap receivers
 - [ ] SMGR API#: API definition table
 - [ ] SMGR CLRD: Clear error dump
 - [ ] SMGR DUMP: Error dump
@@ -34,14 +41,15 @@ Reference: `100051.html` - Wistom API specification
 - [ ] SMGR SDTR: SNMP delete trap receiver (SET only)
 - [ ] SMGR VOLT: System voltages and current
 
-### WSNS (WistSense)
-- [ ] WSNS DATA: Get spectra for debugging
-- [ ] WSNS ENAB: Enable/disable WistSense
-- [ ] WSNS FILT: Software filtering of spectra
-- [ ] WSNS NEXT: Get current peak frequencies
-- [ ] WSNS PARA: WistSense parameters
-- [ ] WSNS PORT: Calibration and sensor ports
-- [ ] WSNS RAWB: Raw spectrum without bias correction
+### WSNS (WistSense) ✅ COMPLETED
+High-level API available via `WistSenseAPI` class in `wistomwsns.py`
+- [x] WSNS DATA: Get spectra for debugging - `wsns.get_data()`
+- [x] WSNS ENAB: Enable/disable WistSense - `wsns.get_enabled()` / `wsns.set_enabled()`
+- [x] WSNS FILT: Software filtering of spectra - `wsns.get_filt()` / `wsns.set_filt()`
+- [x] WSNS NEXT: Get current peak frequencies - `wsns.get_next()`
+- [x] WSNS PARA: WistSense parameters - `wsns.get_para()` / `wsns.set_para()`
+- [x] WSNS PORT: Calibration and sensor ports - `wsns.get_port()`
+- [x] WSNS RAWB: Raw spectrum without bias correction - `wsns.get_rawb()`
 
 ### OPM# (Optical Performance Monitor)
 - [ ] OPM# AVRG: OPM average
