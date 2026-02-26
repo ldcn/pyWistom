@@ -100,6 +100,10 @@ RESPONSE_PARSER = {
         # Spectrum parameter operations here
     },
 
+    "WICA": {  # Wistom Calibration operations
+        "FRQC": "_parse_wica_frqc_response",
+    },
+
     "WSNS": {  # Wistsense operations
         "ENAB": "_parse_wistsense_enable",
         "PORT": "_parse_wsns_port",
