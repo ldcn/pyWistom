@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyWistom"
+version = "0.1.0"
+description = "Python wrapper for the Wistom API"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "sshtunnel",
+]
+
+[project.optional-dependencies]
+dev = [
+    "flake8",
+    "sphinx",
+]
+
+[tool.setuptools]
+py-modules = [
+    "pyWistom",
+    "wistomconfig",
+    "wistomconnection",
+    "wistomconstants",
+    "wistomresponses",
+    "wistomtags",
+]
