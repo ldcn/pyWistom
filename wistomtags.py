@@ -349,6 +349,14 @@ TAG_PARSER = {
             2: "channel_table",
         }
     },
+    'WICA': {  # Wistom Calibration operations
+        'FRQC': {  # Frequency compensation
+            1: "lambda0",
+            2: "d_lambda",
+            3: "time_to_start",
+            4: "dtime",
+        },
+
     'WSNS': {
         'NEXT': {
             101: "port_1_peak_frequencies",
