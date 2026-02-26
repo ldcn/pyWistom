@@ -51,6 +51,30 @@ class WistomClient:
         self.connection.disconnect()
 
     def login(self):
+        """
+        Authenticate with the Wistom device.
+
+        Sends a login request using the user ID and password provided at
+        client construction. The login uses the LGIN application with the
+        configured API version. This is called automatically when using
+        the context manager (``with`` statement).
+
+        See API spec LGIN (100051.html).
+
+        :returns: Raw login response bytes from the device, containing
+            the login result code indicating success (user level 1-5) or
+            failure reason (e.g. wrong password, user not found, max users).
+        :rtype: bytes
+
+        :raises ConnectionError: If not connected to device
+        :raises TimeoutError: If device does not respond within timeout
+
+        Example::
+
+            >>> client = WistomClient(HOST, PORT, USER_ID, PASSWORD)
+            >>> client.connection.connect()
+            >>> response = client.login()
+        """
         response = self.connection.login(
             self.user_id,
             self.password,
@@ -69,6 +93,46 @@ class WistomClient:
     # API Commands
 
     def get_smgr_info(self):
+        """
+        Get product and calibration information from the System Manager.
+
+        Retrieves hardware, sensor, software, and firmware identification
+        strings as well as calibration frequency and temperature ranges.
+        See API spec SMGR INFO (100051.html).
+
+        :returns: Dictionary with product information:
+            - ``hardware_product_number`` (str): Hardware product number
+            - ``hardware_id_number`` (str): Hardware identification number
+            - ``hardware_revision`` (str): Hardware revision
+            - ``hardware_serial_number`` (str): Hardware serial number
+            - ``sensor_product_number`` (str): Sensor product number
+            - ``sensor_id_number`` (str): Sensor identification number
+            - ``sensor_revision`` (str): Sensor revision
+            - ``sensor_serial_number`` (str): Sensor serial number
+            - ``software_product_number`` (str): Software product number
+            - ``software_revision`` (str): Software revision
+            - ``firmware_revision`` (str): Firmware revision
+            - ``pld_revision`` (str): PLD revision
+            - ``bootstrap_revision`` (str): Bootstrap revision
+            - ``switch_software_revision`` (str): Switch software revision
+            - ``unit_serial`` (str): Unit serial number
+            - ``production_date`` (str): Production date
+            - ``start_calibration_frequency`` (float): Start of calibration frequency range (GHz)
+            - ``end_calibration_frequency`` (float): End of calibration frequency range (GHz)
+            - ``start_calibration_temperature`` (float): Start of calibration temperature range (°C)
+            - ``end_calibration_temperature`` (float): End of calibration temperature range (°C)
+        :rtype: dict
+
+        :raises TimeoutError: If device does not respond within timeout
+        :raises ConnectionError: If not connected to device
+
+        Example::
+
+            >>> with WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
+            ...     info = client.get_smgr_info()
+            ...     print(info['hardware_serial_number'])
+            '123456'
+        """
         self.__increment_token()
         return self.__send_request(
             COMMAND_ID['GET'],
