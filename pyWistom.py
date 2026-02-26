@@ -207,6 +207,46 @@ class WistomClient:
             b''
         )
 
+    def get_wica_frqc(self):
+        """
+        Get frequency compensation parameters from WICA calibration.
+
+        Retrieves the linear approximation parameters used for frequency
+        compensation of the fiber optic sensor. The wavelength is computed as:
+        :math:`\\lambda = k_\\lambda \\cdot t + \\lambda_0`
+        where *t* is the time after the pulse start, and frequency is
+        :math:`\\nu = c / \\lambda`.
+
+        The complete compensation also includes look-up tables (see WICA LUTF).
+        See API spec WICA FRQC (100051.html).
+
+        :returns: Dictionary with frequency compensation parameters:
+            - ``lambda0`` (float): Constant value in the linear wavelength
+              approximation, in metres (FLOAT32)
+            - ``d_lambda`` (float): Factor in the linear wavelength
+              approximation, in m/s (FLOAT32)
+            - ``time_to_start`` (float): Position on the fiber where the
+              LUT is valid, in seconds (FLOAT64)
+            - ``dtime`` (float): Time step in the LUT, in seconds (FLOAT64)
+        :rtype: dict
+
+        :raises TimeoutError: If device does not respond within timeout
+        :raises ConnectionError: If not connected to device
+
+        Example::
+
+            >>> with WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:
+            ...     frqc = client.get_wica_frqc()
+            ...     print(f"lambda0: {frqc['lambda0']} m")
+        """
+        self.__increment_token()
+        return self.__send_request(
+            COMMAND_ID['GET'],
+            b'WICA',
+            b'FRQC',
+            b''
+        )
+
     def custom_api_request(self, command_id, app_id, op_id, data):
         self.__increment_token()
         return self.__send_request(
@@ -657,6 +697,41 @@ class WistomClient:
                 '>d', response[index:index + 8])[0]
             index += 8
         return frequency_regulator_values
+
+    # ------------------------------------------------------------------
+    # WICA (Wistom Calibration) API function parsers
+    # For reference, see Wistom API documentation (document 100051)
+    # ------------------------------------------------------------------
+
+    def _parse_wica_frqc_response(self, response, data=None):
+        """
+        Parse the WICA FRQC (frequency compensation) response.
+
+        Tags 1-2 are FLOAT32 (4 bytes), tags 3-4 are FLOAT64 (8 bytes).
+
+        :param response: Raw response bytes from the WICA FRQC command.
+        :param data: Optional data parameter (unused).
+        :returns: Dictionary with frequency compensation parameters.
+        :rtype: dict
+        """
+        frqc = {}
+        index = 16  # Skip header
+        while index < len(response):
+            tag = response[index]
+            index += 1
+            tag_name = TAG_PARSER.get('WICA', {}).get(
+                'FRQC', {}).get(tag, f"unknown_tag_{tag}")
+            if tag in (1, 2):  # FLOAT32
+                frqc[tag_name] = struct.unpack(
+                    '>f', response[index:index + 4])[0]
+                index += 4
+            elif tag in (3, 4):  # FLOAT64
+                frqc[tag_name] = struct.unpack(
+                    '>d', response[index:index + 8])[0]
+                index += 8
+            else:
+                break  # Unknown tag, stop parsing
+        return frqc
 
     # ------------------------------------------------------------------
     # Wistsense API function parsers
