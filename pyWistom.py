@@ -117,10 +117,14 @@ class WistomClient:
             - ``switch_software_revision`` (str): Switch software revision
             - ``unit_serial`` (str): Unit serial number
             - ``production_date`` (str): Production date
-            - ``start_calibration_frequency`` (float): Start of calibration frequency range (GHz)
-            - ``end_calibration_frequency`` (float): End of calibration frequency range (GHz)
-            - ``start_calibration_temperature`` (float): Start of calibration temperature range (°C)
-            - ``end_calibration_temperature`` (float): End of calibration temperature range (°C)
+            - ``start_calibration_frequency`` (float): Start of calibration
+              frequency range (GHz)
+            - ``end_calibration_frequency`` (float): End of calibration
+              frequency range (GHz)
+            - ``start_calibration_temperature`` (float): Start of calibration
+              temperature range (°C)
+            - ``end_calibration_temperature`` (float): End of calibration
+              temperature range (°C)
         :rtype: dict
 
         :raises TimeoutError: If device does not respond within timeout
