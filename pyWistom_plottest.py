@@ -1,5 +1,4 @@
-from pyWistom import WistomClient, COMMAND_ID
-from wistomconfig import HOST, PORT, USER_ID, PASSWORD
+from pyWistom import WistomClient, COMMAND_ID, HOST, PORT, USER_ID, PASSWORD
 import numpy as np
 
 with WistomClient(HOST, PORT, USER_ID, PASSWORD) as client:

@@ -1,16 +1,11 @@
-import socket
-import struct
-import cProfile
-import pstats
-
-from wistomconfig import (
-    HOST,
-    PORT,
-    USER_ID,
-    PASSWORD,
-    API_VERSION
+from wistomconnection import WistomConnection
+from wistomtags import (
+    TAG_PARSER,
 )
-
+from wistomresponses import (
+    RESPONSE_HEADER_PARSER,
+    RESPONSE_PARSER,
+)
 from wistomconstants import (
     COMMAND_ID,
     LOGIN_RESULT,
@@ -23,13 +18,34 @@ from wistomresponses import (
     RESPONSE_HEADER_PARSER,
     RESPONSE_PARSER,
 )
+import os
+import socket
+import struct
+import logging
+import threading
+import cProfile
+import pstats
 
-from wistomtags import (
-    TAG_PARSER,
-)
+import yaml
 
-from wistomconnection import WistomConnection
+_SETTINGS_FILE = os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), "settings.yaml")
 
+with open(_SETTINGS_FILE, "r", encoding="utf-8") as _f:
+    _cfg = yaml.safe_load(_f) or {}
+
+_device = _cfg.get("device", {})
+
+HOST = _device.get("host", "")
+PORT = _device.get("port", 7734)
+USER_ID = _device.get("user_id", "")
+PASSWORD = _device.get("password", "")
+API_VERSION = _device.get("api_version", "API2")
+SSH_HOST = _device.get("ssh_host", "") or HOST
+SSH_PORT = _device.get("ssh_port", 22)
+
+
+logger = logging.getLogger(__name__)
 
 MAX_TAGS = 255
 
