@@ -1,7 +1,5 @@
 import time
-from pyWistom import WistomClient
-from pyWistom import COMMAND_ID
-from wistomconfig import HOST, PORT, USER_ID, PASSWORD
+from pyWistom import WistomClient, COMMAND_ID, HOST, PORT, USER_ID, PASSWORD
 
 iterations = 100
 
