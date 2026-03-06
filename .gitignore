@@ -175,3 +175,5 @@ cython_debug/
 pyWistom.ipynb
 
 .github/
+JavaWNMS/wnms
+JavaWNMS/
