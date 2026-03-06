@@ -112,6 +112,27 @@ TAG_PARSER = {
             1: "ocm_enabled",
         },
     },
+    'ALMH': {
+        'SUBS': {
+            1: "alarm_id",
+            2: "alarm_sub_id",
+            3: "status_filter",
+            5: "subscription_mode",
+            6: "subscription_token",
+        },
+        'UNSU': {
+            6: "subscription_token",
+        },
+        'ALRM': {
+            1: "alarm_id",
+            2: "alarm_sub_id",
+            3: "status",
+            4: "timestamp_snmp",
+            5: "timestamp_unix",
+            6: "timestamp_ms",
+            7: "extended_info",
+        },
+    },
     'OPM#': {
         'AVRG': {
             1: "averages",  # U32
@@ -311,10 +332,23 @@ TAG_PARSER = {
         },
     },
     'SPEC': {
+        'SWIN': {
+            **{i: f"port_{i}_installed" for i in range(1, 51)},
+        },
+        'SWMO': {
+            1: "mode",
+            2: "manual_port",
+        },
+        'SWCO': {
+            **{i: f"port_{i}_priority" for i in range(1, 17)},
+            **{i + 50: f"port_{i}_description" for i in range(1, 17)},
+            **{i + 100: f"port_{i}_config" for i in range(1, 17)},
+            **{i + 150: f"port_{i}_attenuation" for i in range(1, 17)},
+        },
         'CHNL': {
             1: "channel_id_map",
             2: "channel_id",
-            100: "switch_port",  # Appears in this order in the documentation
+            100: "switch_port",
             3: "activate_mask",
             4: "nominal_frequency",
             5: "nominal_power",

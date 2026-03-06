@@ -76,3 +76,37 @@ PORT_TYPE = {
     3: "Interferometer port",
     4: "Interferometer port",  # difference?
 }
+
+# Alarm element sizes (bytes per element, excluding header)
+# Indexed by alarm command id
+
+ALARM_ELEMENT_SIZE = {
+    ALARM_ID["NO_TIME"]: 8,       # id(2) + sub_id(2) + status(4)
+    ALARM_ID["SNMP"]: 12,         # + timestamp(4)
+    ALARM_ID["EPOCH"]: 12,        # + timestamp(4)
+    ALARM_ID["UPTIME_MS"]: 12,    # + timestamp(4)
+    ALARM_ID["EPOCH_MS"]: 14,     # + timestamp(4) + extended(2)
+}
+
+# Channel status codes used in OPM channel data (tags 9, 10, 11)
+
+CHANNEL_STATUS = {
+    0: "Passed",
+    1: "Warning low",
+    2: "Warning high",
+    3: "Alarm low",
+    4: "Alarm high",
+    5: "Not available",
+}
+
+# Alarm IDs (semantic names for the alarm_id field in alarm messages)
+
+ALARM_TYPE = {
+    10: "OCM",
+    20: "OPM",
+    21: "NewChannelCount",
+    22: "NewChannelFound",
+    30: "Temperature",
+    90: "SystemEvent",
+    91: "ModuleStatus",
+}

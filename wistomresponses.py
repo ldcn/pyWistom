@@ -39,7 +39,9 @@ RESPONSE_PARSER = {
         "SINF": "_parse_login_session_info_response",
     },
     "ALMH": {
-        # Alarm handler operations here
+        "SUBS": "",  # SET only — SETACK/SETNACK
+        "UNSU": "",  # SET only — SETACK/SETNACK
+        "ALRM": "_parse_almh_alrm_response",
     },
     "OPM#": {
         # OPM operations here
@@ -97,7 +99,16 @@ RESPONSE_PARSER = {
     },
 
     "SPEC": {
-        # Spectrum parameter operations here
+        "SWIN": "_parse_spec_swin_response",
+        "SWMO": "_parse_spec_swmo_response",
+        "SWCO": "_parse_spec_swco_response",
+        "CTBL": "_parse_spec_ctbl_response",
+        "CHNL": "_parse_spec_chnl_response",
+        "DELC": "",  # SET only
+    },
+
+    "OCM#": {
+        "ENAB": "_parse_ocm_enable_response",
     },
 
     "WICA": {  # Wistom Calibration operations
