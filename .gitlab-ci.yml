@@ -16,7 +16,11 @@
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
+variables:
+  CI_IMAGE: ${CI_REGISTRY_IMAGE}:latest
+
 stages:
+  - image
   - lint
   - test
   - build
@@ -24,18 +28,31 @@ stages:
   - publish
   - release
 
+build-image:
+  stage: image
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_IMAGE .
+    - docker push $CI_IMAGE
+  rules:
+    - changes:
+        - Dockerfile
+        - requirements.txt
+    - if: $CI_PIPELINE_SOURCE == "web"
+
 lint:
   stage: lint
-  image: python:3.12
+  image: $CI_IMAGE
   script:
-    - pip install flake8
     - flake8 .
 
 test:
   stage: test
-  image: python:3.12
+  image: $CI_IMAGE
   script:
-    - pip install -r requirements.txt
     - |
       if ls test*.py 1> /dev/null 2>&1; then
         python -m unittest discover -v
@@ -45,15 +62,14 @@ test:
 
 build:
   stage: build
-  image: python:3.12
+  image: $CI_IMAGE
   script:
-    - echo "Build step (optional for pure Python projects)"
+    - python -m build
 
 docs:
   stage: docs
-  image: python:3.12
+  image: $CI_IMAGE
   script:
-    - pip install sphinx
     - sphinx-apidoc -o docs .
     - sphinx-build -b html docs docs/_build/html
   artifacts:
@@ -62,9 +78,8 @@ docs:
 
 publish:
   stage: publish
-  image: python:3.12
+  image: $CI_IMAGE
   script:
-    - pip install build twine
     - python -m build
     - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token
       python -m twine upload

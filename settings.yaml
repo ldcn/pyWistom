@@ -28,8 +28,9 @@ last_project_path: ''
 
 # SMTP Email Configuration
 email:
-  server: ''            # SMTP server hostname, e.g. 'smtp.example.com'
+  server: 'proximion-com.mail.protection.outlook.com'            # SMTP server hostname, e.g. 'smtp.example.com'
   port: 25              # SMTP port (25, 465, 587)
-  sender: ''            # From address, e.g. 'wnms@example.com'
+  sender: 'wnms@proximion.com'            # From address, e.g. 'wnms@example.com'
   recipients:           # List of recipient addresses
-    - ''
+    - 'emir.alwan@proximion.com'
+    - 'it-admin@proximion.com'
